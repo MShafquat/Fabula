@@ -2,8 +2,6 @@
 
 Fabula is a magical, AI-powered language learning application that generates personalized short stories to help you master new languages through immersive storytelling.
 
-![Fabula Preview](https://raw.githubusercontent.com/MShafquat/Fabula/main/public/preview.png) *(Note: Add your own preview image here)*
-
 ## ✨ Features
 
 ### 🎙️ Immersive Audio Experience
