@@ -1,19 +1,16 @@
 import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
 
-
-
 export async function POST(req) {
     try {
         const { language, level, topic } = await req.json();
 
         if (!process.env.OPENAI_API_KEY) {
-            // Mock response for development if no key
             return NextResponse.json({
                 title: "The Mysterious Key",
                 content: `Once upon a time, in a land where API keys were scarce, a developer tried to build a magnificent app. (This is a mock story because OPENAI_API_KEY is missing). Target Language: ${language}. Level: ${level}.`,
                 vocabulary: [
-                    { word: "developer", translation: "desarrollador", definition: "A person who writes code." }
+                    { word: "developer", translation: "desarrollador", definition: "A person who writes code.", part_of_speech: "noun", pronunciation: "/de.sa.ro.ʎa.ðoɾ/", example: "El developer escribe código.", example_translation: "The developer writes code." }
                 ],
                 exercises: []
             });
@@ -23,33 +20,86 @@ export async function POST(req) {
             apiKey: process.env.OPENAI_API_KEY,
         });
 
-        const systemPrompt = `You are a skilled storyteller and language teacher. Your goal is to write a short story in the target language: ${language}, suitable for a learner at the ${level} level. 
+        const wordCountMap = {
+            'Beginner': '100-150',
+            'Intermediate': '200-250',
+            'Advanced': '300-400',
+        };
+        const wordRange = wordCountMap[level] || '200-300';
+
+        const systemPrompt = `You are a skilled storyteller and language teacher. Your goal is to write a short, engaging story in the target language: ${language}, suitable for a learner at the ${level} level.
     The story should be about: ${topic}.
-    
+    Write with vocabulary appropriate for ${level} learners (simpler for Beginner, more nuanced for Intermediate, sophisticated for Advanced).
+
     Return the response strictly as valid JSON with the following structure:
     {
       "title": "Story Title in Target Language",
       "title_translation": "English translation of the title",
-      "content": "The full story text...",
+      "content": "The full story text (${wordRange} words)...",
       "content_translation": "Full English translation of the story content...",
       "vocabulary": [
-        { 
-          "word": "word from story", 
-          "translation": "english translation", 
+        {
+          "word": "key word from story",
+          "translation": "english translation",
           "definition": "simple definition in english",
-          "part_of_speech": "noun/verb/adj",
+          "part_of_speech": "noun/verb/adj/adv",
           "pronunciation": "Phonetic representation using the TARGET LANGUAGE's own sounds (e.g., IPA or native phonetics), NOT English-based phonetics.",
           "example": "Example sentence using the word.",
           "example_translation": "English translation of the example."
         }
       ],
       "exercises": [
-         { "question": "Question about the story?", "options": ["A", "B", "C"], "answer": "correct option" }
+        {
+          "type": "comprehension",
+          "question": "Multiple choice question about the story",
+          "options": ["Option A", "Option B", "Option C", "Option D"],
+          "answer": "correct option",
+          "explanation": "Brief explanation of why this is correct"
+        },
+        {
+          "type": "fill_in_blank",
+          "question": "Complete: '_______ was the main character.'",
+          "blanks": ["Protagonist name"],
+          "answer": "Protagonist name",
+          "explanation": "Brief explanation"
+        },
+        {
+          "type": "vocabulary",
+          "question": "What does '[word]' mean in this context?",
+          "options": ["Definition A", "Definition B", "Definition C"],
+          "answer": "correct definition",
+          "explanation": "Brief explanation"
+        },
+        {
+          "type": "word_match",
+          "instruction": "Match each word with its translation",
+          "pairs": [
+            { "word": "word in target language", "translation": "english translation" },
+            { "word": "word2", "translation": "translation2" },
+            { "word": "word3", "translation": "translation3" },
+            { "word": "word4", "translation": "translation4" }
+          ]
+        },
+        {
+          "type": "word_scramble",
+          "instruction": "Unscramble the letters to form a word from the story",
+          "scrambled": "scrambled letters of the word",
+          "answer": "the correct word",
+          "hint": "A short clue about the word meaning"
+        },
+        {
+          "type": "sentence_order",
+          "instruction": "Put the words in the correct order to form a sentence from the story",
+          "words": ["word1", "word2", "word3", "word4", "word5"],
+          "answer": "word1 word2 word3 word4 word5",
+          "translation": "English translation of the sentence"
+        }
       ]
     }
-    
-    Ensure the vocabulary list contains 5-10 key words from the story.
-    The content should be approximately 200-300 words.`;
+
+    Ensure the vocabulary list contains 8-12 key words from the story.
+    The content should be approximately ${wordRange} words.
+    Generate exactly 6 exercises: 1 comprehension (multiple choice about the story), 1 fill_in_blank, 1 vocabulary (multiple choice definitions), 1 word_match (with exactly 4 word-translation pairs from the vocabulary), 1 word_scramble (scramble a vocabulary word's letters), and 1 sentence_order (use a short sentence of 4-7 words from the story, split into individual words). Make sure the word_scramble scrambled field is a proper anagram of the answer field.`;
 
         const completion = await openai.chat.completions.create({
             messages: [{ role: "system", content: systemPrompt }],
@@ -61,19 +111,20 @@ export async function POST(req) {
 
         // Generate Image
         try {
-            const imagePrompt = `Sketch-style color illustration for a storybook. Scene: ${result.title}. Style: clean lines, minimal details. Hand-drawn feel. ${topic} theme. No text.`;
+            const imagePrompt = `A children's storybook illustration drawn with thick crayon lines and colored pencils on cream-colored paper. The scene depicts "${result.title}" with a ${topic} theme. Style: childlike crayon drawing with visible pencil strokes, uneven coloring, simple shapes, bright primary colors (red, blue, yellow, green), slightly wobbly outlines like a talented 8-year-old drew it. Warm, joyful, whimsical. NO text, NO words, NO letters anywhere in the image. Simple background with crayon texture.`;
 
             const imageResponse = await openai.images.generate({
-                model: "dall-e-2",
+                model: "dall-e-3",
                 prompt: imagePrompt,
                 n: 1,
-                size: "512x512",
+                size: "1024x1024",
+                quality: "standard",
+                style: "natural"
             });
 
             result.imageUrl = imageResponse.data[0].url;
         } catch (imgError) {
             console.error("Image generation failed:", imgError);
-            // Fallback or leave undefined (frontend handles placeholder)
         }
 
         return NextResponse.json(result);

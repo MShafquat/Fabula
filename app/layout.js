@@ -1,8 +1,8 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'Fabula - Tales for Learning',
-  description: 'Learn languages through immersive stories.',
+  title: 'Fabula - Story Adventures for Language Learners',
+  description: 'Learn languages through fun, interactive AI-generated stories!',
 }
 
 export default function RootLayout({ children }) {
