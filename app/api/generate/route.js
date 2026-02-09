@@ -112,9 +112,9 @@ export async function POST(req) {
         // Generate Image
         try {
             const imageStyles = {
-                'Beginner': `A storybook illustration drawn with thick crayon lines and colored pencils on cream-colored paper. The scene depicts "${result.title}" with a ${topic} theme. Style: crayon drawing with visible pencil strokes, uneven coloring, simple shapes, bright primary colors, slightly wobbly outlines. Warm, joyful, whimsical. NO text, NO words, NO letters anywhere in the image. Simple background with crayon texture.`,
-                'Intermediate': `A charming illustrated storybook scene depicting "${result.title}" with a ${topic} theme. Style: hand-drawn watercolor and ink illustration, soft color washes, expressive line work, detailed but approachable, like a beautifully illustrated novel. Warm lighting, inviting atmosphere. NO text, NO words, NO letters anywhere in the image.`,
-                'Advanced': `An elegant editorial illustration depicting "${result.title}" with a ${topic} theme. Style: sophisticated watercolor and gouache painting, rich color palette, atmospheric depth, detailed scenery, evocative mood, like a premium literary magazine illustration. NO text, NO words, NO letters anywhere in the image.`,
+                'Beginner': `An elegant colored pencil illustration on textured cream paper depicting "${result.title}" with a ${topic} theme. Style: fine colored pencil strokes with soft blending, gentle shading, delicate hatching, warm pastel tones mixed with rich saturated colors. Clean graceful lines, charming characters, inviting composition. Like a beautifully illustrated storybook. NO text, NO words, NO letters anywhere in the image.`,
+                'Intermediate': `A refined colored pencil and soft watercolor illustration depicting "${result.title}" with a ${topic} theme. Style: detailed colored pencil work with watercolor washes, expressive yet polished line work, rich color palette, layered shading and texturing. Atmospheric and immersive, like illustrations in a quality literary novel. NO text, NO words, NO letters anywhere in the image.`,
+                'Advanced': `A sophisticated colored pencil illustration with fine detail depicting "${result.title}" with a ${topic} theme. Style: masterful colored pencil rendering, precise shading, rich tonal depth, subtle color gradients, intricate details, atmospheric lighting. Evocative and cinematic composition, like a premium illustrated edition. NO text, NO words, NO letters anywhere in the image.`,
             };
             const imagePrompt = imageStyles[level] || imageStyles['Intermediate'];
 
@@ -124,7 +124,7 @@ export async function POST(req) {
                 n: 1,
                 size: "1024x1024",
                 quality: "standard",
-                style: level === 'Beginner' ? "natural" : "vivid"
+                style: "natural"
             });
 
             result.imageUrl = imageResponse.data[0].url;
