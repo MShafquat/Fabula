@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BookOpen, Sparkles, ChevronLeft, Search } from 'lucide-react';
 
-const AGE_GROUPS = [
-    { id: '5-7', label: 'Ages 5-7', emoji: '🧒', sublabel: 'Little Learner', level: 'Beginner' },
-    { id: '8-10', label: 'Ages 8-10', emoji: '🧑', sublabel: 'Explorer', level: 'Intermediate' },
-    { id: '11-13', label: 'Ages 11-13', emoji: '🧑‍🎓', sublabel: 'Scholar', level: 'Advanced' },
+const LEVELS = [
+    { id: 'beginner', label: 'Beginner', emoji: '🌱', sublabel: 'Just starting out', level: 'Beginner' },
+    { id: 'intermediate', label: 'Intermediate', emoji: '📖', sublabel: 'Building confidence', level: 'Intermediate' },
+    { id: 'advanced', label: 'Advanced', emoji: '🎯', sublabel: 'Polishing fluency', level: 'Advanced' },
 ];
 
 const LANGUAGES = [
@@ -108,12 +108,12 @@ const CATEGORIES = [
 export default function Home() {
     const router = useRouter();
     const [step, setStep] = useState(1);
-    const [selectedAge, setSelectedAge] = useState(null);
+    const [selectedLevel, setSelectedLevel] = useState(null);
     const [selectedLang, setSelectedLang] = useState(null);
     const [selectedTopic, setSelectedTopic] = useState(null);
     const [langSearch, setLangSearch] = useState('');
 
-    const selectedAgeGroup = AGE_GROUPS.find(a => a.id === selectedAge);
+    const selectedLevelObj = LEVELS.find(a => a.id === selectedLevel);
 
     const filteredLanguages = langSearch
         ? LANGUAGES.filter(l => l.label.toLowerCase().includes(langSearch.toLowerCase()))
@@ -122,8 +122,8 @@ export default function Home() {
     const languageGroups = ['European', 'Asian', 'Other'];
 
     const handleStart = () => {
-        if (!selectedAge || !selectedLang || !selectedTopic) return;
-        const level = selectedAgeGroup.level;
+        if (!selectedLevel || !selectedLang || !selectedTopic) return;
+        const level = selectedLevelObj.level;
         router.push(`/story?lang=${encodeURIComponent(selectedLang)}&level=${encodeURIComponent(level)}&topic=${encodeURIComponent(selectedTopic)}`);
     };
 
@@ -174,7 +174,7 @@ export default function Home() {
                         lineHeight: '1.5',
                         fontWeight: '400'
                     }}>
-                        Learn languages through magical stories!
+                        Learn languages through engaging stories
                     </p>
                 </div>
 
@@ -207,7 +207,7 @@ export default function Home() {
                     padding: 'clamp(1.5rem, 4vw, 2.5rem)',
                     minHeight: '350px'
                 }}>
-                    {/* STEP 1: Age/Level */}
+                    {/* STEP 1: Level */}
                     {step === 1 && (
                         <div style={{ animation: 'fadeInUp 0.4s ease-out' }}>
                             <h2 style={{
@@ -219,30 +219,30 @@ export default function Home() {
                                 textTransform: 'none',
                                 letterSpacing: '0'
                             }}>
-                                How old are you?
+                                What's your level?
                             </h2>
 
                             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                                {AGE_GROUPS.map(age => (
+                                {LEVELS.map(lvl => (
                                     <button
-                                        key={age.id}
-                                        onClick={() => { setSelectedAge(age.id); setTimeout(() => setStep(2), 300); }}
+                                        key={lvl.id}
+                                        onClick={() => { setSelectedLevel(lvl.id); setTimeout(() => setStep(2), 300); }}
                                         style={{
                                             flex: '1 1 160px',
                                             maxWidth: '200px',
                                             padding: '1.5rem 1rem',
                                             borderRadius: '20px',
-                                            border: `3px solid ${selectedAge === age.id ? '#4361ee' : '#e0e0e0'}`,
-                                            background: selectedAge === age.id ? 'rgba(67, 97, 238, 0.05)' : 'white',
+                                            border: `3px solid ${selectedLevel === lvl.id ? '#4361ee' : '#e0e0e0'}`,
+                                            background: selectedLevel === lvl.id ? 'rgba(67, 97, 238, 0.05)' : 'white',
                                             cursor: 'pointer',
                                             transition: 'all 0.25s ease',
                                             textAlign: 'center',
-                                            boxShadow: selectedAge === age.id ? '0 0 0 3px rgba(67, 97, 238, 0.15)' : '0 4px 12px rgba(0,0,0,0.06)',
+                                            boxShadow: selectedLevel === lvl.id ? '0 0 0 3px rgba(67, 97, 238, 0.15)' : '0 4px 12px rgba(0,0,0,0.06)',
                                         }}
                                     >
-                                        <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '0.5rem' }}>{age.emoji}</span>
-                                        <span style={{ fontFamily: 'var(--font-playful)', fontSize: '1.1rem', fontWeight: '600', display: 'block', color: '#2d2d2d', marginBottom: '0.25rem' }}>{age.label}</span>
-                                        <span style={{ fontFamily: 'var(--font-playful)', fontSize: '0.8rem', color: '#888' }}>{age.sublabel}</span>
+                                        <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '0.5rem' }}>{lvl.emoji}</span>
+                                        <span style={{ fontFamily: 'var(--font-playful)', fontSize: '1.1rem', fontWeight: '600', display: 'block', color: '#2d2d2d', marginBottom: '0.25rem' }}>{lvl.label}</span>
+                                        <span style={{ fontFamily: 'var(--font-playful)', fontSize: '0.8rem', color: '#888' }}>{lvl.sublabel}</span>
                                     </button>
                                 ))}
                             </div>
@@ -261,7 +261,7 @@ export default function Home() {
                                 textTransform: 'none',
                                 letterSpacing: '0'
                             }}>
-                                Pick a language!
+                                Pick a language
                             </h2>
 
                             {/* Search */}
@@ -334,7 +334,7 @@ export default function Home() {
                                 textTransform: 'none',
                                 letterSpacing: '0'
                             }}>
-                                What story do you want?
+                                Choose your story
                             </h2>
 
                             {CATEGORIES.map(cat => (
@@ -416,7 +416,7 @@ export default function Home() {
 
                     {/* Selection summary */}
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-                        {selectedAge && (
+                        {selectedLevel && (
                             <span style={{
                                 padding: '0.35rem 0.75rem',
                                 background: '#eef2ff',
@@ -426,7 +426,7 @@ export default function Home() {
                                 fontWeight: '500',
                                 color: '#4361ee'
                             }}>
-                                {AGE_GROUPS.find(a => a.id === selectedAge)?.emoji} {selectedAge}
+                                {LEVELS.find(a => a.id === selectedLevel)?.emoji} {LEVELS.find(a => a.id === selectedLevel)?.label}
                             </span>
                         )}
                         {selectedLang && (
@@ -446,18 +446,18 @@ export default function Home() {
 
                     <button
                         onClick={handleStart}
-                        disabled={!selectedAge || !selectedLang || !selectedTopic}
+                        disabled={!selectedLevel || !selectedLang || !selectedTopic}
                         style={{
                             padding: '0.85rem 2rem',
                             borderRadius: '14px',
                             border: 'none',
-                            background: (selectedAge && selectedLang && selectedTopic) ? 'linear-gradient(135deg, #4361ee, #4cc9f0)' : '#d1d5db',
+                            background: (selectedLevel && selectedLang && selectedTopic) ? 'linear-gradient(135deg, #4361ee, #4cc9f0)' : '#d1d5db',
                             color: 'white',
                             fontFamily: 'var(--font-playful)',
                             fontWeight: '700',
                             fontSize: '1.05rem',
-                            cursor: (selectedAge && selectedLang && selectedTopic) ? 'pointer' : 'default',
-                            boxShadow: (selectedAge && selectedLang && selectedTopic) ? '0 8px 20px rgba(67, 97, 238, 0.3)' : 'none',
+                            cursor: (selectedLevel && selectedLang && selectedTopic) ? 'pointer' : 'default',
+                            boxShadow: (selectedLevel && selectedLang && selectedTopic) ? '0 8px 20px rgba(67, 97, 238, 0.3)' : 'none',
                             transition: 'all 0.3s ease',
                             whiteSpace: 'nowrap'
                         }}

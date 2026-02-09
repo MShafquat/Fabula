@@ -111,7 +111,12 @@ export async function POST(req) {
 
         // Generate Image
         try {
-            const imagePrompt = `A children's storybook illustration drawn with thick crayon lines and colored pencils on cream-colored paper. The scene depicts "${result.title}" with a ${topic} theme. Style: childlike crayon drawing with visible pencil strokes, uneven coloring, simple shapes, bright primary colors (red, blue, yellow, green), slightly wobbly outlines like a talented 8-year-old drew it. Warm, joyful, whimsical. NO text, NO words, NO letters anywhere in the image. Simple background with crayon texture.`;
+            const imageStyles = {
+                'Beginner': `A storybook illustration drawn with thick crayon lines and colored pencils on cream-colored paper. The scene depicts "${result.title}" with a ${topic} theme. Style: crayon drawing with visible pencil strokes, uneven coloring, simple shapes, bright primary colors, slightly wobbly outlines. Warm, joyful, whimsical. NO text, NO words, NO letters anywhere in the image. Simple background with crayon texture.`,
+                'Intermediate': `A charming illustrated storybook scene depicting "${result.title}" with a ${topic} theme. Style: hand-drawn watercolor and ink illustration, soft color washes, expressive line work, detailed but approachable, like a beautifully illustrated novel. Warm lighting, inviting atmosphere. NO text, NO words, NO letters anywhere in the image.`,
+                'Advanced': `An elegant editorial illustration depicting "${result.title}" with a ${topic} theme. Style: sophisticated watercolor and gouache painting, rich color palette, atmospheric depth, detailed scenery, evocative mood, like a premium literary magazine illustration. NO text, NO words, NO letters anywhere in the image.`,
+            };
+            const imagePrompt = imageStyles[level] || imageStyles['Intermediate'];
 
             const imageResponse = await openai.images.generate({
                 model: "dall-e-3",
@@ -119,7 +124,7 @@ export async function POST(req) {
                 n: 1,
                 size: "1024x1024",
                 quality: "standard",
-                style: "natural"
+                style: level === 'Beginner' ? "natural" : "vivid"
             });
 
             result.imageUrl = imageResponse.data[0].url;

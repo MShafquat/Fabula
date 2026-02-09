@@ -1287,7 +1287,7 @@ function StoryContent() {
                     📖
                 </div>
                 <h2 style={{ fontSize: '2rem', fontFamily: 'var(--font-playful)', color: 'var(--ink)', marginBottom: '1rem', textTransform: 'none' }}>
-                    Brewing your story...
+                    Creating your story...
                 </h2>
                 <p style={{ color: '#666', fontSize: '1.1rem', fontFamily: 'var(--font-playful)' }}>
                     Creating a {level.toLowerCase()} {lang} story about {topic.toLowerCase()}
