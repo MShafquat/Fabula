@@ -242,7 +242,7 @@ function AuthModal({ onSuccess }) {
                         </form>
 
                         <p style={{ marginTop: '1.25rem', fontSize: '.72rem', color: '#94a3b8', fontFamily: 'var(--font-playful)' }}>
-                            Free forever · No credit card · Cancel anytime
+                            Free forever · No credit card needed
                         </p>
 
                         <Link href="/" style={{
@@ -932,8 +932,8 @@ function StoryContent() {
     const handleWordDoubleClick = async (e) => {
         e.stopPropagation(); e.preventDefault();
         const selection = window.getSelection();
-        const word = selection.toString().trim();
-        if (!word) return;
+        const word = selection?.toString().trim();
+        if (!word || !selection || selection.rangeCount === 0) return;
 
         const range = selection.getRangeAt(0);
         const rect = range.getBoundingClientRect();

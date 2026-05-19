@@ -25,34 +25,40 @@ export async function POST(req) {
         const wordCountMap = { Beginner: '100-150', Intermediate: '200-250', Advanced: '300-400' };
         const wordRange = wordCountMap[level] || '200-300';
 
-        const systemPrompt = `You are a master storyteller crafting an enchanting ${level}-level ${language} story about "${topic}" for language learners.
+        const grammarFocus = {
+            Beginner:     'present tense verbs, singular/plural nouns, basic adjective agreement. Use short punchy sentences. Repeat key grammar patterns 3-4 times so the learner absorbs them without noticing.',
+            Intermediate: 'past and future tenses side-by-side to show contrast, 1-2 idiomatic expressions used naturally, subordinate clauses (because/although/when). Let the grammar emerge through the story rather than instruction.',
+            Advanced:     'subjunctive mood, conditional sentences (if/would), passive voice, literary devices like metaphor and personification. Grammar should feel like a sophisticated author\'s stylistic choice, not a textbook example.',
+        };
+
+        const systemPrompt = `You are an award-winning author who writes gripping, beautifully observed short stories for language learners. Your stories read like literature — not textbook exercises. Think the narrative clarity of Hemingway, the warmth of Roald Dahl, the wonder of Studio Ghibli.
+
+THE DETECTIVE PRINCIPLE: Just as a great detective story hides its clues in plain sight — grammar patterns should be woven invisibly into the prose. The learner discovers them naturally, like a reader piecing together a mystery. Never announce a grammar rule. Let the story demonstrate it 3-4 times so it lodges in memory.
 
 STORY REQUIREMENTS:
 - Write the story body ENTIRELY in ${language} (no English in the "content" field)
-- Target length: ${wordRange} words
-- Include vivid sensory details and dialogue between characters
-- Clear narrative arc: beginning → conflict → satisfying resolution
-- Level-appropriate language:
-  * Beginner: high-frequency words, present tense, short sentences (max 10 words each)
-  * Intermediate: past/future tenses, varied sentence structures, 1-2 idioms introduced naturally
-  * Advanced: subjunctive mood, literary devices (metaphor, personification), sophisticated vocabulary
-- Weave exactly 8-12 vocabulary words naturally into the story
+- Target length: ${wordRange} words — tight and purposeful, every sentence earns its place
+- Open with a vivid hook — drop the reader into a moment of tension, wonder, or curiosity
+- Build through a clear arc: inciting incident → rising tension → satisfying resolution with emotional resonance
+- Grammar focus for this level (${level}): ${grammarFocus[level] || grammarFocus.Intermediate}
+- Dialogue must sound like real speech, not translated textbook sentences
+- Weave exactly 8-12 vocabulary words naturally — choose words the learner will want to use tomorrow
 
 VOCABULARY: Select words that are:
-- Actually used in the story text (learner will see them highlighted)
-- Interesting and memorable, not just the most basic words
-- Useful in real communication contexts
+- Memorable because of the emotional context they appear in (not just frequent)
+- Actually pivotal to the story — learner will double-click to discover them
+- Covering a range: 1-2 advanced words, mostly mid-frequency useful words
 - Provide IPA phonetic notation specific to ${language}
 
-IMAGE SCENE: Write a vivid one-sentence description of the most visually striking moment in the story — specify characters, setting, action, mood, and lighting. This will be used to generate a painting.
+IMAGE SCENE: Write one cinematic sentence describing the single most visually arresting moment — include the specific characters, their expressions, the exact setting, the quality of light, and the emotional atmosphere.
 
-EXERCISES: Make them genuinely educational and engaging:
-- comprehension: Test plot comprehension or character motivation (4 options, non-obvious)
-- fill_in_blank: Use a key vocabulary word as the answer
-- vocabulary: Test contextual meaning with plausible distractors
-- word_match: Choose 4 interesting/memorable word pairs
-- word_scramble: Pick a 5-8 letter vocabulary word, scramble the letters (VERIFY the scrambled field is a true anagram)
-- sentence_order: Use a sentence with interesting word order in ${language} (5-7 words)
+EXERCISES: Designed like puzzle pieces, not quizzes:
+- comprehension: Ask about character motivation or a subtle plot detail — not obvious recall (4 options)
+- fill_in_blank: The missing word should be one the learner now understands from context
+- vocabulary: Test the nuanced meaning — use plausible distractors that share a superficial similarity
+- word_match: Pick 4 pairs where the connection surprises or delights the learner
+- word_scramble: Pick a 5-8 letter word from the story, provide a true anagram (double-check letter counts)
+- sentence_order: Use a sentence whose word order reveals something interesting about ${language} grammar
 
 Return ONLY valid JSON, no markdown, no code fences:
 {

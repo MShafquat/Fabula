@@ -191,11 +191,6 @@ function getDailyCount() {
     if (date !== getTodayStr()) return 0;
     return parseInt(localStorage.getItem('fabula_daily_count') || '0');
 }
-function isPremium() {
-    if (typeof window === 'undefined') return false;
-    return localStorage.getItem('fabula_premium') === 'true';
-}
-
 const FREE_LIMIT = 3;
 
 // ─── Greeting Rotator ─────────────────────────────────────────────────────────
@@ -245,12 +240,11 @@ export default function Home() {
     const [selectedTopic, setSelectedTopic] = useState(null);
     const [langSearch, setLangSearch]       = useState('');
     const [dailyCount, setDailyCount]       = useState(0);
-    const [premium, setPremium]             = useState(false);
 
-    useEffect(() => { setDailyCount(getDailyCount()); setPremium(isPremium()); }, []);
+    useEffect(() => { setDailyCount(getDailyCount()); }, []);
 
     const storiesLeft = Math.max(0, FREE_LIMIT - dailyCount);
-    const canGenerate = premium || storiesLeft > 0;
+    const canGenerate = storiesLeft > 0;
 
     const selectedLevelObj = LEVELS.find(l => l.id === selectedLevel);
 
@@ -402,16 +396,13 @@ export default function Home() {
                 </div>
 
                 {/* ── FREE COUNTER ──────────────────────────────────────── */}
-                {!premium && (
-                    <div className="freemium-banner">
-                        <span className="free-text">
-                            🎁 {storiesLeft > 0
-                                ? `${storiesLeft} free ${storiesLeft === 1 ? 'story' : 'stories'} remaining today — resets at midnight`
-                                : "Daily limit reached — come back tomorrow or go Premium!"}
-                        </span>
-                        <button className="upgrade-btn">⭐ Unlimited — 299 ৳/mo</button>
-                    </div>
-                )}
+                <div className="freemium-banner">
+                    <span className="free-text">
+                        🎁 {storiesLeft > 0
+                            ? `${storiesLeft} free ${storiesLeft === 1 ? 'story' : 'stories'} remaining today — resets at midnight`
+                            : 'Daily limit reached — create a free account for unlimited stories!'}
+                    </span>
+                </div>
 
                 {/* ── CHAPTER STEPS ─────────────────────────────────────── */}
                 <div className="chapter-steps">
