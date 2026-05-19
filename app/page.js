@@ -191,7 +191,7 @@ function getDailyCount() {
     if (date !== getTodayStr()) return 0;
     return parseInt(localStorage.getItem('fabula_daily_count') || '0');
 }
-const FREE_LIMIT = 3;
+const FREE_LIMIT = 1;
 
 // ─── Greeting Rotator ─────────────────────────────────────────────────────────
 function GreetingRotator() {

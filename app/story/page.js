@@ -33,7 +33,7 @@ const speak = (text, lang, onEnd) => {
 // ─── Usage tracking (localStorage, anonymous users only) ─────────────────────
 const STORAGE_DATE  = 'fabula_usage_date';
 const STORAGE_COUNT = 'fabula_daily_count';
-const FREE_LIMIT    = 3;
+const FREE_LIMIT    = 1;
 
 const getTodayStr = () => new Date().toISOString().split('T')[0];
 
