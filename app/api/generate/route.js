@@ -1,7 +1,6 @@
 import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
 
-export const maxDuration = 60;
 
 export async function POST(req) {
     try {
@@ -98,33 +97,6 @@ Return ONLY valid JSON, no markdown, no code fences:
         });
 
         const result = JSON.parse(completion.choices[0].message.content);
-
-        // Generate stunning storybook illustration
-        try {
-            const scene = result.imagePromptScene || `A magical ${topic} scene with warm lighting`;
-
-            const artStyles = {
-                Beginner: `A magical children's picture book illustration. Watercolor washes with bold expressive ink outlines in the style of Quentin Blake meets Beatrix Potter. Scene: ${scene}. Soft warm amber afternoon light. Rich jewel-tone colors — emerald greens, sapphire blues, amber golds — against creamy parchment. Adorable characters with expressive big eyes and warm smiles. Whimsical magical details: glowing fireflies, floating petals, enchanted sparkles. Lush detailed foliage and environment. NO text, letters, words, or writing anywhere in the image. NO pencils, pens, paintbrushes, or drawing tools in scene. Utterly warm, magical, and inviting.`,
-                Intermediate: `A richly illustrated young-adult novel chapter artwork. Detailed gouache painting technique with confident ink linework. Visual storytelling inspired by Studio Ghibli and classic fairy tale illustration masters. Scene: ${scene}. Dynamic composition with layered foreground, middle, and background. Golden hour or magical twilight lighting. Atmospheric depth and detailed environmental storytelling. Characters with visible personality and emotion. Color palette: rich indigos, warm golds, deep forest greens, accent rose. Beautiful textures — fabric, stone, wood grain, water. NO text or writing. NO art tools or drawing implements. Cinematic and enchanting.`,
-                Advanced: `A sophisticated literary novel illustration. Oil painting technique with Baroque compositional depth and luminous chiaroscuro lighting. Scene: ${scene}. Rich tonal range from velvet shadows to brilliant highlights. Intricate environmental storytelling — architecture, textiles, atmospheric perspective. Characters portrayed with psychological complexity through expression and posture. Color story: deep midnight purples and blues punctuated with warm candlelight gold, jewel-like accent colors throughout. Museum-quality masterwork rendering. NO text anywhere. NO drawing instruments. Painterly, emotionally resonant, visually arresting.`,
-            };
-
-            const imagePrompt = artStyles[level] || artStyles.Intermediate;
-
-            const imageResponse = await openai.images.generate({
-                model: "dall-e-3",
-                prompt: imagePrompt,
-                n: 1,
-                size: "1024x1024",
-                quality: "standard",
-                style: "natural",
-            });
-
-            result.imageUrl = imageResponse.data[0].url;
-        } catch (imgErr) {
-            console.error("Image generation failed:", imgErr.message);
-        }
-
         return NextResponse.json(result);
 
     } catch (error) {

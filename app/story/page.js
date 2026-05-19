@@ -878,7 +878,21 @@ function StoryContent() {
             body: JSON.stringify({ language: lang, level, topic }),
         })
         .then(r => r.json())
-        .then(data => { setStory(data); if (!isLoggedIn) incrementDailyUsage(); })
+        .then(data => {
+            setStory(data);
+            if (!isLoggedIn) incrementDailyUsage();
+            // Fetch illustration separately (Edge runtime, up to 25s)
+            if (data.imagePromptScene) {
+                fetch('/api/image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ scene: data.imagePromptScene, level }),
+                })
+                .then(r => r.json())
+                .then(img => { if (img.url) setStory(s => ({ ...s, imageUrl: img.url })); })
+                .catch(() => {});
+            }
+        })
         .catch(e => console.error(e))
         .finally(() => setLoading(false));
     }, [lang, level, topic]);
@@ -1095,6 +1109,16 @@ function StoryContent() {
                     marginBottom: '3rem',
                 }}>
                     {/* Image */}
+                    {!story.imageUrl && story.imagePromptScene && (
+                        <div style={{
+                            marginBottom: '1.75rem', borderRadius: 16, overflow: 'hidden',
+                            aspectRatio: '1/1', background: 'linear-gradient(110deg,#f3e8ff 30%,#e0f2fe 50%,#f3e8ff 70%)',
+                            backgroundSize: '200% 100%', animation: 'shimmer 1.6s linear infinite',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                            <p style={{ fontFamily: 'var(--font-playful)', color: '#a78bfa', fontSize: '.88rem' }}>✨ Painting your illustration…</p>
+                        </div>
+                    )}
                     {story.imageUrl && (
                         <div className="story-image-frame" style={{ marginBottom: '1.75rem', position: 'relative' }}>
                             <img src={story.imageUrl} alt="Story illustration" style={{ width: '100%', height: 'auto', display: 'block' }} />
