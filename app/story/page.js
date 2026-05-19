@@ -1148,13 +1148,13 @@ function StoryContent() {
                     marginBottom: '3rem',
                 }}>
                     {/* Banner illustration */}
-                    <div style={{ marginBottom: '1.75rem', borderRadius: 16, overflow: 'hidden', position: 'relative', height: 220 }}>
+                    <div style={{ marginBottom: '1.75rem', borderRadius: 16, overflow: 'hidden', position: 'relative', height: 240 }}>
                         {story.imageUrl ? (
                             <>
                                 <img
                                     src={story.imageUrl}
                                     alt="Story illustration"
-                                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
                                 />
                                 <button onClick={toggleAudio} style={{
                                     position: 'absolute', bottom: '.75rem', right: '.75rem',
@@ -1171,7 +1171,7 @@ function StoryContent() {
                             </>
                         ) : (
                             <div style={{
-                                width: '100%', height: '100%',
+                                position: 'absolute', inset: 0,
                                 background: 'linear-gradient(110deg,#1a1630 30%,#221c40 50%,#1a1630 70%)',
                                 backgroundSize: '200% 100%', animation: 'shimmer 1.6s linear infinite',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
