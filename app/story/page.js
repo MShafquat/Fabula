@@ -1154,7 +1154,7 @@ function StoryContent() {
                                 <img
                                     src={story.imageUrl}
                                     alt="Story illustration"
-                                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+                                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', display: 'block' }}
                                 />
                                 <button onClick={toggleAudio} style={{
                                     position: 'absolute', bottom: '.75rem', right: '.75rem',
