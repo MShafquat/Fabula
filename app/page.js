@@ -257,8 +257,19 @@ export default function Home() {
         router.push(`/story?lang=${encodeURIComponent(selectedLang)}&level=${encodeURIComponent(selectedLevelObj.level)}&topic=${encodeURIComponent(selectedTopic)}`);
     };
 
+    const QUICK_STARTS = [
+        { lang: 'French',   level: 'Beginner', topic: 'Fairy Tale',      label: 'French · Fairy Tale' },
+        { lang: 'Japanese', level: 'Beginner', topic: 'Forest Fable',    label: 'Japanese · Forest Fable' },
+        { lang: 'Italian',  level: 'Beginner', topic: 'Cooking Adventure',label: 'Italian · Cooking' },
+        { lang: 'German',   level: 'Beginner', topic: 'Fantasy Quest',   label: 'German · Fantasy' },
+        { lang: 'Korean',   level: 'Beginner', topic: 'Magic School',    label: 'Korean · Magic School' },
+        { lang: 'Arabic',   level: 'Beginner', topic: 'Ancient Legend',  label: 'Arabic · Ancient Legend' },
+        { lang: 'Hindi',    level: 'Beginner', topic: 'Fairy Tale',      label: 'Hindi · Fairy Tale' },
+        { lang: 'Portuguese', level: 'Beginner', topic: 'Ocean Adventure', label: 'Portuguese · Ocean' },
+    ];
+    const quickPick = QUICK_STARTS[new Date().getDay() % QUICK_STARTS.length];
     const quickStart = () => {
-        router.push('/story?lang=Spanish&level=Beginner&topic=Fairy+Tale');
+        router.push(`/story?lang=${encodeURIComponent(quickPick.lang)}&level=${encodeURIComponent(quickPick.level)}&topic=${encodeURIComponent(quickPick.topic)}`);
     };
 
     const goStep = (s) => { if (s < step) setStep(s); };
@@ -378,7 +389,7 @@ export default function Home() {
                         onMouseOver={e => { e.currentTarget.style.background = '#8b5cf6'; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = '#8b5cf6'; }}
                         onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#a78bfa'; e.currentTarget.style.borderColor = 'rgba(139,92,246,0.5)'; }}
                     >
-                        <Zap size={14} /> Try a quick story — Spanish Beginner
+                        <Zap size={14} /> Quick story — {quickPick.label}
                     </button>
                 </div>
 

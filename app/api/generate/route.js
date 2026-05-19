@@ -10,12 +10,6 @@ const grammarFocus = {
     Advanced:     "subjunctive mood, conditional sentences, passive voice, literary devices. Grammar as a stylistic choice, not a textbook example.",
 };
 
-const artStyle = {
-    Beginner:     (s) => `Magical children's picture book illustration. Watercolor washes with bold ink outlines, Quentin Blake meets Beatrix Potter. Scene: ${s}. Warm amber light, jewel-tone colors on creamy parchment. Adorable expressive characters. NO text or letters anywhere.`,
-    Intermediate: (s) => `Young-adult novel chapter artwork. Gouache painting, Studio Ghibli meets classic fairy tale illustration. Scene: ${s}. Golden hour lighting, layered atmospheric depth. Characters with visible personality. NO text anywhere.`,
-    Advanced:     (s) => `Literary novel illustration. Oil painting with Baroque chiaroscuro. Scene: ${s}. Velvet shadows to brilliant highlights. Characters with psychological complexity. NO text anywhere.`,
-};
-
 function buildPrompt(language, level, topic) {
     const wordRange = { Beginner: '100-150', Intermediate: '200-250', Advanced: '300-400' }[level] || '200-250';
     return `You are an award-winning author writing a ${level}-level ${language} story about "${topic}" for language learners.
@@ -106,25 +100,6 @@ export async function POST(req) {
                     send({ type: 'meta', ...parsed });
                 } catch (e) {
                     console.error('Metadata parse error:', e.message, '| raw:', metaBuffer.slice(0, 200));
-                }
-
-                // ── 3. Generate illustration ──────────────────────────────
-                const scene = parsed?.imagePromptScene;
-                if (scene) {
-                    try {
-                        const styleFn = artStyle[level] || artStyle.Intermediate;
-                        const imgRes = await openai.images.generate({
-                            model: 'gpt-image-1',
-                            prompt: styleFn(scene),
-                            n: 1,
-                            size: '1024x1024',
-                            quality: 'low',
-                        });
-                        const b64 = imgRes.data[0]?.b64_json;
-                        if (b64) send({ type: 'image', b64 });
-                    } catch (imgErr) {
-                        console.error('Image generation error:', imgErr.message);
-                    }
                 }
 
                 send({ type: 'done' });

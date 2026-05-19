@@ -877,6 +877,7 @@ function StoryContent() {
 
         let usageCounted = false;
         let contentAcc = '';
+        let imageScene = null;
 
         fetch('/api/generate', {
             method: 'POST',
@@ -908,10 +909,9 @@ function StoryContent() {
                             setStory(s => ({ ...(s || { _partial: true }), content: contentAcc }));
                         } else if (evt.type === 'meta') {
                             const { type: _, ...meta } = evt;
+                            imageScene = meta.imagePromptScene || null;
                             setStory(s => ({ ...(s || {}), ...meta, content: contentAcc }));
                             if (!usageCounted && !isLoggedIn) { incrementDailyUsage(); usageCounted = true; }
-                        } else if (evt.type === 'image') {
-                            setStory(s => ({ ...s, imageUrl: evt.b64 ? 'data:image/png;base64,' + evt.b64 : evt.url }));
                         } else if (evt.type === 'done') {
                             setLoading(false);
                         } else if (evt.type === 'error') {
@@ -921,6 +921,17 @@ function StoryContent() {
                         }
                     } catch { /* skip malformed event */ }
                 }
+            }
+        }).then(() => {
+            // Fetch illustration separately so it doesn't block or timeout story
+            if (imageScene) {
+                fetch('/api/image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ scene: imageScene, level }),
+                }).then(r => r.json()).then(data => {
+                    if (data.b64) setStory(s => ({ ...s, imageUrl: 'data:image/png;base64,' + data.b64 }));
+                }).catch(e => console.error('Image fetch error:', e));
             }
         }).catch(e => console.error(e))
           .finally(() => setLoading(false));
