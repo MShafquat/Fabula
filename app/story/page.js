@@ -1,9 +1,10 @@
 'use client';
 
-import { Suspense, useEffect, useState, useMemo } from 'react';
+import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Loader2, ArrowLeft, Volume2, Play, Pause, Languages, Share2 } from 'lucide-react';
+import { supabase } from '../supabase';
 
 // ─── Speech ───────────────────────────────────────────────────────────────────
 const langMap = {
@@ -29,10 +30,9 @@ const speak = (text, lang, onEnd) => {
     window.speechSynthesis.speak(u);
 };
 
-// ─── Usage tracking (localStorage) ───────────────────────────────────────────
+// ─── Usage tracking (localStorage, anonymous users only) ─────────────────────
 const STORAGE_DATE  = 'fabula_usage_date';
 const STORAGE_COUNT = 'fabula_daily_count';
-const STORAGE_PREM  = 'fabula_premium';
 const FREE_LIMIT    = 3;
 
 const getTodayStr = () => new Date().toISOString().split('T')[0];
@@ -51,8 +51,6 @@ function incrementDailyUsage() {
     localStorage.setItem(STORAGE_DATE, today);
     localStorage.setItem(STORAGE_COUNT, String(count + 1));
 }
-
-const isPremium = () => typeof window !== 'undefined' && localStorage.getItem(STORAGE_PREM) === 'true';
 
 // ─── Session Word Bank (sessionStorage, no account needed) ────────────────────
 const BANK_KEY = 'fabula_session_words';
@@ -97,11 +95,14 @@ function Confetti({ active }) {
     );
 }
 
-// ─── Paywall Modal ────────────────────────────────────────────────────────────
-function PaywallModal() {
-    const [plan, setPlan] = useState('monthly');
+// ─── Auth Modal (sign up / sign in → unlimited stories) ──────────────────────
+function AuthModal({ onSuccess }) {
+    const [tab, setTab]         = useState('signup'); // signup | signin
+    const [email, setEmail]     = useState('');
+    const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError]     = useState('');
+    const [done, setDone]       = useState(false); // email-confirm sent
 
     const resetTime = (() => {
         const now = new Date();
@@ -112,27 +113,37 @@ function PaywallModal() {
         return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
     })();
 
-    async function handleCheckout() {
-        setLoading(true);
-        setError('');
+    async function handleSubmit(e) {
+        e.preventDefault();
+        if (!supabase) { setError('Auth not configured yet — add Supabase env vars.'); return; }
+        setLoading(true); setError('');
         try {
-            const res = await fetch('/api/payment/create-checkout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ plan }),
-            });
-            const data = await res.json();
-            if (data.url) {
-                window.location.href = data.url;
+            if (tab === 'signup') {
+                const { data, error: err } = await supabase.auth.signUp({ email, password });
+                if (err) throw err;
+                if (data.session) {
+                    onSuccess(data.session.user);
+                } else {
+                    setDone(true); // email confirmation required
+                }
             } else {
-                setError(data.error || 'Something went wrong. Please try again.');
-                setLoading(false);
+                const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
+                if (err) throw err;
+                onSuccess(data.session.user);
             }
-        } catch {
-            setError('Network error. Please try again.');
+        } catch (err) {
+            setError(err.message || 'Something went wrong.');
+        } finally {
             setLoading(false);
         }
     }
+
+    const inputStyle = {
+        width: '100%', padding: '.75rem 1rem', borderRadius: 12,
+        border: '2px solid #e2e8f0', fontFamily: 'var(--font-playful)',
+        fontSize: '.95rem', outline: 'none', boxSizing: 'border-box',
+        transition: 'border-color .2s',
+    };
 
     return (
         <div style={{
@@ -142,83 +153,107 @@ function PaywallModal() {
         }}>
             <div style={{
                 background: 'white', borderRadius: 28, padding: '2.5rem',
-                maxWidth: 480, width: '100%', textAlign: 'center',
+                maxWidth: 440, width: '100%', textAlign: 'center',
                 boxShadow: '0 20px 60px rgba(124,58,237,.22)',
                 border: '2px solid rgba(124,58,237,.1)',
                 animation: 'popIn .4s ease-out',
             }}>
-                <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>📚</div>
-                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.7rem', color: '#7c3aed', marginBottom: '.5rem' }}>
-                    Daily limit reached!
-                </h2>
-                <p style={{ color: '#64748b', fontFamily: 'var(--font-playful)', marginBottom: '.4rem', fontSize: '.95rem' }}>
-                    You&apos;ve used all 3 free stories today.
-                </p>
-                <p style={{ color: '#94a3b8', fontSize: '.82rem', fontFamily: 'var(--font-playful)', marginBottom: '1.75rem' }}>
-                    Resets in <strong style={{ color: '#7c3aed' }}>{resetTime}</strong> — or unlock unlimited access now.
-                </p>
+                {done ? (
+                    <>
+                        <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>📬</div>
+                        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: '#7c3aed', marginBottom: '.5rem' }}>
+                            Check your email
+                        </h2>
+                        <p style={{ color: '#64748b', fontFamily: 'var(--font-playful)', fontSize: '.92rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+                            We sent a confirmation link to <strong>{email}</strong>. Click it, then come back and sign in.
+                        </p>
+                        <button onClick={() => { setDone(false); setTab('signin'); }} style={{
+                            padding: '.75rem 2rem', background: 'linear-gradient(135deg,#7c3aed,#0ea5e9)',
+                            color: 'white', border: 'none', borderRadius: 14,
+                            fontFamily: 'var(--font-playful)', fontWeight: 700, fontSize: '.95rem', cursor: 'pointer',
+                        }}>Sign in now</button>
+                    </>
+                ) : (
+                    <>
+                        <div style={{ fontSize: '3rem', marginBottom: '.75rem' }}>📚</div>
+                        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.65rem', color: '#7c3aed', marginBottom: '.35rem' }}>
+                            {tab === 'signup' ? 'Create a free account' : 'Welcome back!'}
+                        </h2>
+                        <p style={{ color: '#64748b', fontFamily: 'var(--font-playful)', fontSize: '.88rem', marginBottom: '1.5rem' }}>
+                            {tab === 'signup'
+                                ? 'Free account = unlimited stories, all languages, forever.'
+                                : `Daily limit reached. Sign in to keep reading. Resets in ${resetTime}.`}
+                        </p>
 
-                {/* Plan toggle */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.75rem', marginBottom: '1.5rem' }}>
-                    {[
-                        { key: 'monthly', label: 'Monthly', price: '$4.99', sub: 'per month' },
-                        { key: 'yearly',  label: 'Yearly',  price: '$39.99', sub: 'per year · save 33%' },
-                    ].map(({ key, label, price, sub }) => (
-                        <button key={key} onClick={() => setPlan(key)} style={{
-                            background: plan === key
-                                ? 'linear-gradient(135deg,rgba(124,58,237,.1),rgba(14,165,233,.1))'
-                                : '#f8fafc',
-                            borderRadius: 14, padding: '1rem',
-                            border: plan === key ? '2px solid #7c3aed' : '2px solid #e2e8f0',
-                            cursor: 'pointer', textAlign: 'center',
+                        {/* Tab switcher */}
+                        <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 12, padding: '.25rem', marginBottom: '1.5rem' }}>
+                            {[['signup','Sign up'],['signin','Sign in']].map(([key, label]) => (
+                                <button key={key} onClick={() => { setTab(key); setError(''); }} style={{
+                                    flex: 1, padding: '.55rem', border: 'none', borderRadius: 10,
+                                    background: tab === key ? 'white' : 'transparent',
+                                    color: tab === key ? '#7c3aed' : '#64748b',
+                                    fontFamily: 'var(--font-playful)', fontWeight: tab === key ? 700 : 500,
+                                    fontSize: '.88rem', cursor: 'pointer',
+                                    boxShadow: tab === key ? '0 2px 8px rgba(0,0,0,.08)' : 'none',
+                                    transition: 'all .2s',
+                                }}>{label}</button>
+                            ))}
+                        </div>
+
+                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '.75rem', textAlign: 'left' }}>
+                            <div>
+                                <label style={{ fontFamily: 'var(--font-playful)', fontSize: '.8rem', color: '#64748b', display: 'block', marginBottom: '.3rem' }}>Email</label>
+                                <input
+                                    type="email" required value={email}
+                                    onChange={e => setEmail(e.target.value)}
+                                    placeholder="you@example.com"
+                                    style={inputStyle}
+                                    onFocus={e => e.target.style.borderColor = '#7c3aed'}
+                                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                                />
+                            </div>
+                            <div>
+                                <label style={{ fontFamily: 'var(--font-playful)', fontSize: '.8rem', color: '#64748b', display: 'block', marginBottom: '.3rem' }}>Password</label>
+                                <input
+                                    type="password" required value={password}
+                                    onChange={e => setPassword(e.target.value)}
+                                    placeholder={tab === 'signup' ? 'At least 6 characters' : 'Your password'}
+                                    style={inputStyle}
+                                    onFocus={e => e.target.style.borderColor = '#7c3aed'}
+                                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                                />
+                            </div>
+
+                            {error && (
+                                <p style={{ color: '#e11d48', fontSize: '.82rem', fontFamily: 'var(--font-playful)', margin: 0 }}>{error}</p>
+                            )}
+
+                            <button type="submit" disabled={loading} style={{
+                                padding: '.9rem', marginTop: '.25rem',
+                                background: loading ? '#d1d5db' : 'linear-gradient(135deg,#7c3aed,#0ea5e9)',
+                                color: 'white', border: 'none', borderRadius: 14,
+                                fontFamily: 'var(--font-playful)', fontWeight: 700, fontSize: '1rem',
+                                cursor: loading ? 'default' : 'pointer',
+                                boxShadow: loading ? 'none' : '0 8px 24px rgba(124,58,237,.3)',
+                                transition: 'opacity .2s',
+                            }}>
+                                {loading ? '⏳ Please wait…' : tab === 'signup' ? '✨ Create account — it\'s free' : '→ Sign in'}
+                            </button>
+                        </form>
+
+                        <p style={{ marginTop: '1.25rem', fontSize: '.72rem', color: '#94a3b8', fontFamily: 'var(--font-playful)' }}>
+                            Free forever · No credit card · Cancel anytime
+                        </p>
+
+                        <Link href="/" style={{
+                            display: 'block', marginTop: '.75rem', padding: '.4rem',
+                            color: '#94a3b8', fontFamily: 'var(--font-playful)',
+                            fontSize: '.82rem', textDecoration: 'none',
                         }}>
-                            <p style={{ fontFamily: 'var(--font-playful)', fontWeight: 700, color: plan === key ? '#7c3aed' : '#64748b', marginBottom: '.25rem', fontSize: '.85rem' }}>
-                                {plan === key ? '⭐ ' : ''}{label}
-                            </p>
-                            <p style={{ fontSize: '1.35rem', fontWeight: 900, color: '#1e1b4b', fontFamily: 'var(--font-heading)', marginBottom: '.15rem' }}>{price}</p>
-                            <p style={{ fontSize: '.68rem', color: plan === key ? '#7c3aed' : '#94a3b8', fontWeight: plan === key ? 600 : 400 }}>{sub}</p>
-                        </button>
-                    ))}
-                </div>
-
-                {/* Benefits */}
-                <div style={{ background: 'linear-gradient(135deg,rgba(124,58,237,.05),rgba(14,165,233,.05))', borderRadius: 14, padding: '1rem', marginBottom: '1.5rem', textAlign: 'left' }}>
-                    {['Unlimited stories every day', 'All 38 languages', 'HD illustrated stories', 'Full exercise suite', 'Cancel anytime'].map(b => (
-                        <p key={b} style={{ fontFamily: 'var(--font-playful)', fontSize: '.83rem', color: '#1e1b4b', marginBottom: '.25rem' }}>✅ {b}</p>
-                    ))}
-                </div>
-
-                {error && (
-                    <p style={{ color: '#e11d48', fontSize: '.82rem', fontFamily: 'var(--font-playful)', marginBottom: '.75rem' }}>{error}</p>
+                            ← Back to home · Try again in {resetTime}
+                        </Link>
+                    </>
                 )}
-
-                <button
-                    onClick={handleCheckout}
-                    disabled={loading}
-                    style={{
-                        width: '100%', padding: '1rem 2rem',
-                        background: loading ? '#d1d5db' : 'linear-gradient(135deg,#7c3aed,#0ea5e9)',
-                        color: 'white', border: 'none', borderRadius: 14,
-                        fontFamily: 'var(--font-playful)', fontWeight: 700, fontSize: '1rem',
-                        cursor: loading ? 'default' : 'pointer',
-                        boxShadow: loading ? 'none' : '0 8px 24px rgba(124,58,237,.35)',
-                        marginBottom: '.75rem', transition: 'opacity .2s',
-                    }}
-                >
-                    {loading ? '⏳ Redirecting to checkout…' : `🌟 Unlock Premium — ${plan === 'yearly' ? '$39.99/yr' : '$4.99/mo'}`}
-                </button>
-
-                <p style={{ fontSize: '.7rem', color: '#94a3b8', fontFamily: 'var(--font-playful)', marginBottom: '.75rem' }}>
-                    Secured by Stripe · Cancel anytime · Instant access
-                </p>
-
-                <Link href="/" style={{
-                    display: 'block', padding: '.5rem',
-                    color: '#94a3b8', fontFamily: 'var(--font-playful)',
-                    fontSize: '.85rem', textDecoration: 'none',
-                }}>
-                    ← Back to home · Try again in {resetTime}
-                </Link>
             </div>
         </div>
     );
@@ -801,6 +836,8 @@ function StoryContent() {
     const level = searchParams.get('level') || 'Beginner';
     const topic = searchParams.get('topic') || 'Fairy Tale';
 
+    const [user, setUser]                 = useState(null);
+    const [authReady, setAuthReady]       = useState(false);
     const [story, setStory]               = useState(null);
     const [loading, setLoading]           = useState(false);
     const [blocked, setBlocked]           = useState(false);
@@ -817,11 +854,23 @@ function StoryContent() {
     const [sessionWords, setSessionWords] = useState([]);
     const [copied, setCopied]             = useState(false);
 
-    // Check usage limit before fetching
+    // Supabase auth state
     useEffect(() => {
+        if (!supabase) { setAuthReady(true); return; }
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user ?? null);
+            setAuthReady(true);
+        });
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+            setUser(session?.user ?? null);
+        });
+        return () => subscription.unsubscribe();
+    }, []);
+
+    const fetchStory = useCallback((isLoggedIn) => {
         const { count } = getDailyUsage();
-        const prem = isPremium();
-        if (!prem && count >= FREE_LIMIT) { setBlocked(true); return; }
+        if (!isLoggedIn && count >= FREE_LIMIT) { setBlocked(true); return; }
+        setBlocked(false);
         setLoading(true);
         fetch('/api/generate', {
             method: 'POST',
@@ -829,10 +878,22 @@ function StoryContent() {
             body: JSON.stringify({ language: lang, level, topic }),
         })
         .then(r => r.json())
-        .then(data => { setStory(data); incrementDailyUsage(); })
+        .then(data => { setStory(data); if (!isLoggedIn) incrementDailyUsage(); })
         .catch(e => console.error(e))
         .finally(() => setLoading(false));
     }, [lang, level, topic]);
+
+    // Fetch once auth state is known
+    useEffect(() => {
+        if (!authReady) return;
+        fetchStory(!!user);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [authReady]);
+
+    const handleAuthSuccess = useCallback((newUser) => {
+        setUser(newUser);
+        fetchStory(true);
+    }, [fetchStory]);
 
     // Load session words
     useEffect(() => { setSessionWords(getSessionWords()); }, []);
@@ -919,7 +980,7 @@ function StoryContent() {
     };
 
     // ── Blocked by usage limit ──
-    if (blocked) return <PaywallModal lang={lang} level={level} topic={topic} />;
+    if (blocked) return <AuthModal onSuccess={handleAuthSuccess} />;
 
     // ── Loading ──
     if (loading) return (
@@ -986,7 +1047,7 @@ function StoryContent() {
                         onMouseOut={e => e.currentTarget.style.color = '#64748b'}>
                         <ArrowLeft size={15} /> Back to Stories
                     </Link>
-                    <div style={{ display: 'flex', gap: '.5rem' }}>
+                    <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                         {/* Meta pills */}
                         {[
                             { label: lang, bg: '#f3e8ff', color: '#7c3aed' },
@@ -995,6 +1056,26 @@ function StoryContent() {
                         ].map(p => (
                             <span key={p.label} style={{ padding: '.25rem .65rem', background: p.bg, borderRadius: 50, fontSize: '.72rem', fontFamily: 'var(--font-playful)', fontWeight: 700, color: p.color }}>{p.label}</span>
                         ))}
+                        {/* User indicator */}
+                        {user ? (
+                            <button onClick={() => supabase?.auth.signOut()} title="Sign out" style={{
+                                display: 'inline-flex', alignItems: 'center', gap: '.3rem',
+                                padding: '.25rem .7rem', background: '#f0fdf4', borderRadius: 50,
+                                border: '1.5px solid #bbf7d0', fontSize: '.72rem',
+                                fontFamily: 'var(--font-playful)', fontWeight: 700, color: '#15803d',
+                                cursor: 'pointer',
+                            }}>
+                                ✓ {user.email?.split('@')[0]}
+                            </button>
+                        ) : (
+                            <span style={{
+                                padding: '.25rem .7rem', background: '#fef9c3', borderRadius: 50,
+                                fontSize: '.72rem', fontFamily: 'var(--font-playful)', fontWeight: 600,
+                                color: '#92400e', border: '1.5px solid #fde68a',
+                            }}>
+                                {FREE_LIMIT - getDailyUsage().count} stories left today
+                            </span>
+                        )}
                     </div>
                 </div>
 
