@@ -1035,8 +1035,13 @@ function StoryContent() {
             <Confetti active={showConfetti} />
 
             {popup.open && (
-                <WordPopup {...popup} wordData={popup.data} lang={lang}
-                    onClose={() => setPopup(p => ({ ...p, open: false }))} />
+                <WordPopup
+                    wordData={popup.data}
+                    position={popup.pos}
+                    isLoading={popup.loading}
+                    lang={lang}
+                    onClose={() => setPopup(p => ({ ...p, open: false }))}
+                />
             )}
 
             <div style={{ maxWidth: 900, margin: '0 auto' }}>
