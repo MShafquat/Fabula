@@ -912,6 +912,10 @@ function StoryContent() {
                             setStory(s => ({ ...s, imageUrl: evt.url }));
                         } else if (evt.type === 'done') {
                             setLoading(false);
+                        } else if (evt.type === 'error') {
+                            console.error('API error:', evt.message);
+                            setLoading(false);
+                            // story stays null → shows error screen with actual message
                         }
                     } catch { /* skip malformed event */ }
                 }

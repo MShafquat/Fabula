@@ -1,65 +1,42 @@
-export const runtime = 'edge';
+import { OpenAI } from 'openai';
+
+export const maxDuration = 60;
+
+const DELIM = '---METADATA---';
 
 const grammarFocus = {
-    Beginner:     'present tense verbs, singular/plural nouns, basic adjective agreement. Use short punchy sentences. Repeat key grammar patterns 3-4 times so the learner absorbs them without noticing.',
-    Intermediate: 'past and future tenses side-by-side to show contrast, 1-2 idiomatic expressions used naturally, subordinate clauses (because/although/when). Let the grammar emerge through the story.',
-    Advanced:     "subjunctive mood, conditional sentences (if/would), passive voice, literary devices like metaphor and personification. Grammar should feel like a sophisticated author's stylistic choice.",
+    Beginner:     'present tense verbs, singular/plural nouns, basic adjective agreement. Short punchy sentences. Repeat key patterns 3-4 times.',
+    Intermediate: 'past and future tenses side-by-side, 1-2 idiomatic expressions, subordinate clauses (because/although/when).',
+    Advanced:     "subjunctive mood, conditional sentences, passive voice, literary devices. Grammar as a stylistic choice, not a textbook example.",
 };
 
 const artStyle = {
-    Beginner:     (s) => `Magical children's picture book illustration. Watercolor washes with bold ink outlines in the style of Quentin Blake meets Beatrix Potter. Scene: ${s}. Warm amber light. Jewel-tone colors — emerald, sapphire, amber — against creamy parchment. Adorable expressive characters. Whimsical details: glowing fireflies, floating petals, enchanted sparkles. NO text or letters anywhere. Warm, magical, inviting.`,
-    Intermediate: (s) => `Richly illustrated young-adult novel artwork. Gouache painting with confident ink linework, Studio Ghibli meets classic fairy tale illustration. Scene: ${s}. Golden hour lighting, layered atmospheric composition. Characters with visible personality. Color palette: rich indigos, warm golds, deep forest greens. NO text anywhere. Cinematic and enchanting.`,
-    Advanced:     (s) => `Sophisticated literary novel illustration. Oil painting with Baroque chiaroscuro. Scene: ${s}. Velvet shadows to brilliant highlights. Intricate environmental storytelling. Characters with psychological complexity. Deep midnight purples with warm candlelight gold. Museum-quality rendering. NO text anywhere. Painterly, emotionally resonant.`,
+    Beginner:     (s) => `Magical children's picture book illustration. Watercolor washes with bold ink outlines, Quentin Blake meets Beatrix Potter. Scene: ${s}. Warm amber light, jewel-tone colors on creamy parchment. Adorable expressive characters. NO text or letters anywhere.`,
+    Intermediate: (s) => `Young-adult novel chapter artwork. Gouache painting, Studio Ghibli meets classic fairy tale illustration. Scene: ${s}. Golden hour lighting, layered atmospheric depth. Characters with visible personality. NO text anywhere.`,
+    Advanced:     (s) => `Literary novel illustration. Oil painting with Baroque chiaroscuro. Scene: ${s}. Velvet shadows to brilliant highlights. Characters with psychological complexity. NO text anywhere.`,
 };
 
 function buildPrompt(language, level, topic) {
     const wordRange = { Beginner: '100-150', Intermediate: '200-250', Advanced: '300-400' }[level] || '200-250';
-    return `You are an award-winning author writing a ${level}-level ${language} story about "${topic}" for language learners. Think Hemingway's clarity, Roald Dahl's warmth, Studio Ghibli's wonder.
+    return `You are an award-winning author writing a ${level}-level ${language} story about "${topic}" for language learners.
 
-THE DETECTIVE PRINCIPLE: Grammar patterns are hidden clues — woven invisibly so learners absorb them naturally. Never announce a rule; demonstrate it 3-4 times.
+THE DETECTIVE PRINCIPLE: Grammar patterns are hidden clues woven invisibly so learners absorb them naturally. Never announce a rule; demonstrate it 3-4 times.
 
-REQUIREMENTS:
-- Story body ENTIRELY in ${language} (no English in "content")
+STORY REQUIREMENTS:
+- Story body ENTIRELY in ${language} (no English in the story text)
 - ${wordRange} words — tight, every sentence earns its place
-- Open with a vivid hook — drop the reader into tension, wonder, or curiosity
+- Open with a vivid hook. Clear arc: hook → tension → resolution
 - Grammar focus (${level}): ${grammarFocus[level] || grammarFocus.Intermediate}
-- Dialogue sounds like real speech, not textbook translations
-- Weave exactly 8-12 vocabulary words naturally
+- Dialogue sounds like real speech. Weave 8-12 vocabulary words naturally.
 
-VOCABULARY: Memorable because of the emotional context they appear in. Include IPA phonetics for ${language}.
-IMAGE SCENE: One cinematic sentence — specific characters, setting, exact quality of light, emotional atmosphere.
-EXERCISES: Designed like puzzle pieces, not quizzes.
-
-Return ONLY valid JSON:
-{
-  "title": "story title in ${language}",
-  "title_translation": "English translation",
-  "content": "full story in ${language} (${wordRange} words)",
-  "content_translation": "full English translation",
-  "imagePromptScene": "one vivid cinematic sentence",
-  "vocabulary": [{"word":"","translation":"","definition":"","part_of_speech":"","pronunciation":"","example":"","example_translation":""}],
-  "exercises": [
-    {"type":"comprehension","question":"","options":["","","",""],"answer":"","explanation":""},
-    {"type":"fill_in_blank","question":"","answer":"","explanation":""},
-    {"type":"vocabulary","question":"","options":["","",""],"answer":"","explanation":""},
-    {"type":"word_match","instruction":"","pairs":[{"word":"","translation":""},{"word":"","translation":""},{"word":"","translation":""},{"word":"","translation":""}]},
-    {"type":"word_scramble","instruction":"","scrambled":"","answer":"","hint":""},
-    {"type":"sentence_order","instruction":"","words":[],"answer":"","translation":""}
-  ]
-}`;
+OUTPUT FORMAT — use EXACTLY this structure:
+[Write the full story here in ${language}]
+${DELIM}
+{"title":"story title in ${language}","title_translation":"English title","content_translation":"full English translation","imagePromptScene":"one vivid cinematic sentence describing the most striking visual moment","vocabulary":[{"word":"","translation":"","definition":"","part_of_speech":"","pronunciation":"IPA for ${language}","example":"","example_translation":""}],"exercises":[{"type":"comprehension","question":"","options":["","","",""],"answer":"","explanation":""},{"type":"fill_in_blank","question":"","answer":"","explanation":""},{"type":"vocabulary","question":"","options":["","",""],"answer":"","explanation":""},{"type":"word_match","instruction":"","pairs":[{"word":"","translation":""},{"word":"","translation":""},{"word":"","translation":""},{"word":"","translation":""}]},{"type":"word_scramble","instruction":"","scrambled":"","answer":"","hint":""},{"type":"sentence_order","instruction":"","words":[],"answer":"","translation":""}]}`;
 }
 
-const MOCK = {
-    title: 'La Biblioteca Encantada',
-    title_translation: 'The Enchanted Library',
-    content: 'En un pueblo entre montañas de plata, había una biblioteca donde los libros podían hablar. Cada tarde, el viejo bibliotecario abría las puertas y los niños corrían adentro. "Cuéntame una historia," pedían. Los libros susurraban sus páginas y comenzaban. (Mock — add OPENAI_API_KEY for real stories.)',
-    content_translation: 'In a town nestled between silver mountains, there was a library where books could speak.',
-    imagePromptScene: 'A glowing magical library at dusk, floating books and golden light streaming from enchanted windows, children reading among towering bookshelves',
-    vocabulary: [
-        { word: 'biblioteca', translation: 'library', definition: 'A place where books are kept.', part_of_speech: 'noun', pronunciation: '/bi.blio.ˈte.ka/', example: 'La biblioteca tiene miles de libros.', example_translation: 'The library has thousands of books.' },
-    ],
-    exercises: [],
-};
+const MOCK_STORY = 'En un pueblo entre montañas de plata, había una biblioteca donde los libros podían hablar. Cada tarde, el viejo bibliotecario abría las puertas y los niños corrían adentro. "¡Cuéntame una historia!" pedían. Los libros susurraban y comenzaban. (Add OPENAI_API_KEY for real stories.)';
+const MOCK_META = { title: 'La Biblioteca Encantada', title_translation: 'The Enchanted Library', content_translation: 'In a silver-mountain town, a library where books could speak.', imagePromptScene: 'A glowing magical library at dusk, floating books and golden light', vocabulary: [{ word: 'biblioteca', translation: 'library', definition: 'A place where books are kept.', part_of_speech: 'noun', pronunciation: '/bi.blio.ˈte.ka/', example: 'La biblioteca tiene miles de libros.', example_translation: 'The library has thousands of books.' }], exercises: [] };
 
 export async function POST(req) {
     const { language, level, topic } = await req.json();
@@ -69,105 +46,92 @@ export async function POST(req) {
         async start(controller) {
             const send = (obj) => controller.enqueue(enc.encode(`data: ${JSON.stringify(obj)}\n\n`));
 
-            // Mock mode
+            // Mock mode (no API key)
             if (!process.env.OPENAI_API_KEY) {
-                for (const word of MOCK.content.split(' ')) {
-                    send({ type: 'token', text: word + ' ' });
-                }
-                const { content: _, ...meta } = MOCK;
-                send({ type: 'meta', ...meta });
+                for (const ch of MOCK_STORY) send({ type: 'token', text: ch });
+                send({ type: 'meta', ...MOCK_META });
                 send({ type: 'done' });
                 controller.close();
                 return;
             }
 
+            const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
             try {
-                // ── 1. Stream story from GPT-4o ───────────────────────────
-                const gptRes = await fetch('https://api.openai.com/v1/chat/completions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
-                    body: JSON.stringify({
-                        model: 'gpt-4o',
-                        stream: true,
-                        response_format: { type: 'json_object' },
-                        messages: [{ role: 'system', content: buildPrompt(language, level, topic) }],
-                        temperature: 0.85,
-                    }),
+                // ── 1. Stream story text ──────────────────────────────────
+                const completion = await openai.chat.completions.create({
+                    model: 'gpt-4o',
+                    stream: true,
+                    messages: [{ role: 'system', content: buildPrompt(language, level, topic) }],
+                    temperature: 0.85,
                 });
 
-                const reader = gptRes.body.getReader();
-                const dec = new TextDecoder();
-                let fullJson = '';
-                // State machine: find "content":" in the JSON stream, then forward chars
-                let lookBuf = '';
-                let inContent = false;
-                let escaped = false;
+                let inStory = true;
+                let tail = '';       // buffer last N chars to detect delimiter across chunks
+                let metaBuffer = '';
 
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    const raw = dec.decode(value, { stream: true });
+                for await (const chunk of completion) {
+                    const delta = chunk.choices[0]?.delta?.content ?? '';
+                    if (!delta) continue;
 
-                    for (const line of raw.split('\n')) {
-                        if (!line.startsWith('data: ')) continue;
-                        const payload = line.slice(6).trim();
-                        if (payload === '[DONE]') continue;
-                        try {
-                            const delta = JSON.parse(payload).choices?.[0]?.delta?.content ?? '';
-                            fullJson += delta;
+                    if (inStory) {
+                        const combined = tail + delta;
+                        const delimIdx = combined.indexOf(DELIM);
 
-                            for (const ch of delta) {
-                                if (inContent) {
-                                    if (escaped) {
-                                        escaped = false;
-                                        if (ch === 'n') send({ type: 'token', text: '\n' });
-                                        else if (ch === '"') send({ type: 'token', text: '"' });
-                                        else if (ch === '\\') send({ type: 'token', text: '\\' });
-                                        else send({ type: 'token', text: ch });
-                                    } else if (ch === '\\') {
-                                        escaped = true;
-                                    } else if (ch === '"') {
-                                        inContent = false;
-                                    } else {
-                                        send({ type: 'token', text: ch });
-                                    }
-                                } else {
-                                    lookBuf += ch;
-                                    if (lookBuf.endsWith('"content":"')) { inContent = true; lookBuf = ''; }
-                                    else if (lookBuf.length > 15) lookBuf = lookBuf.slice(-15);
-                                }
-                            }
-                        } catch { /* skip malformed SSE line */ }
+                        if (delimIdx !== -1) {
+                            // Delimiter found — stream everything before it
+                            const before = combined.slice(0, delimIdx);
+                            if (before) send({ type: 'token', text: before });
+                            metaBuffer = combined.slice(delimIdx + DELIM.length);
+                            inStory = false;
+                        } else {
+                            // Stream safe portion (hold back enough chars to catch split delimiter)
+                            const safeLen = Math.max(0, combined.length - DELIM.length);
+                            if (safeLen > 0) send({ type: 'token', text: combined.slice(0, safeLen) });
+                            tail = combined.slice(safeLen);
+                        }
+                    } else {
+                        metaBuffer += delta;
                     }
                 }
+                // Flush tail if delimiter was never found
+                if (inStory && tail) send({ type: 'token', text: tail });
 
-                // ── 2. Parse full JSON for metadata ──────────────────────
+                // ── 2. Parse metadata ─────────────────────────────────────
+                let parsed = null;
                 try {
-                    const parsed = JSON.parse(fullJson);
-                    const { content: _, ...meta } = parsed;
-                    send({ type: 'meta', ...meta });
+                    // Strip any leading/trailing whitespace or markdown fences
+                    const clean = metaBuffer.trim().replace(/^```json\s*/i, '').replace(/```\s*$/, '');
+                    parsed = JSON.parse(clean);
+                    send({ type: 'meta', ...parsed });
+                } catch (e) {
+                    console.error('Metadata parse error:', e.message, '| raw:', metaBuffer.slice(0, 200));
+                }
 
-                    // ── 3. Generate illustration ──────────────────────────
-                    const scene = parsed.imagePromptScene;
-                    if (scene) {
-                        try {
-                            const styleFn = artStyle[level] || artStyle.Intermediate;
-                            const imgRes = await fetch('https://api.openai.com/v1/images/generations', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
-                                body: JSON.stringify({ model: 'dall-e-3', prompt: styleFn(scene), n: 1, size: '1792x1024', quality: 'standard', style: 'natural' }),
-                            });
-                            const imgJson = await imgRes.json();
-                            const url = imgJson.data?.[0]?.url;
-                            if (url) send({ type: 'image', url });
-                        } catch (imgErr) { console.error('Image generation error:', imgErr.message); }
+                // ── 3. Generate illustration ──────────────────────────────
+                const scene = parsed?.imagePromptScene;
+                if (scene) {
+                    try {
+                        const styleFn = artStyle[level] || artStyle.Intermediate;
+                        const imgRes = await openai.images.generate({
+                            model: 'dall-e-3',
+                            prompt: styleFn(scene),
+                            n: 1,
+                            size: '1792x1024',
+                            quality: 'standard',
+                            style: 'natural',
+                        });
+                        const url = imgRes.data[0]?.url;
+                        if (url) send({ type: 'image', url });
+                    } catch (imgErr) {
+                        console.error('Image generation error:', imgErr.message);
                     }
-                } catch (parseErr) { console.error('JSON parse error:', parseErr.message); }
+                }
 
                 send({ type: 'done' });
                 controller.close();
             } catch (err) {
-                console.error('Stream error:', err.message);
+                console.error('Generation error:', err.message);
                 send({ type: 'error', message: err.message });
                 controller.close();
             }
