@@ -1,106 +1,180 @@
-import { OpenAI } from "openai";
-import { NextResponse } from "next/server";
+export const runtime = 'edge';
 
+const grammarFocus = {
+    Beginner:     'present tense verbs, singular/plural nouns, basic adjective agreement. Use short punchy sentences. Repeat key grammar patterns 3-4 times so the learner absorbs them without noticing.',
+    Intermediate: 'past and future tenses side-by-side to show contrast, 1-2 idiomatic expressions used naturally, subordinate clauses (because/although/when). Let the grammar emerge through the story.',
+    Advanced:     "subjunctive mood, conditional sentences (if/would), passive voice, literary devices like metaphor and personification. Grammar should feel like a sophisticated author's stylistic choice.",
+};
 
-export async function POST(req) {
-    try {
-        const { language, level, topic } = await req.json();
+const artStyle = {
+    Beginner:     (s) => `Magical children's picture book illustration. Watercolor washes with bold ink outlines in the style of Quentin Blake meets Beatrix Potter. Scene: ${s}. Warm amber light. Jewel-tone colors — emerald, sapphire, amber — against creamy parchment. Adorable expressive characters. Whimsical details: glowing fireflies, floating petals, enchanted sparkles. NO text or letters anywhere. Warm, magical, inviting.`,
+    Intermediate: (s) => `Richly illustrated young-adult novel artwork. Gouache painting with confident ink linework, Studio Ghibli meets classic fairy tale illustration. Scene: ${s}. Golden hour lighting, layered atmospheric composition. Characters with visible personality. Color palette: rich indigos, warm golds, deep forest greens. NO text anywhere. Cinematic and enchanting.`,
+    Advanced:     (s) => `Sophisticated literary novel illustration. Oil painting with Baroque chiaroscuro. Scene: ${s}. Velvet shadows to brilliant highlights. Intricate environmental storytelling. Characters with psychological complexity. Deep midnight purples with warm candlelight gold. Museum-quality rendering. NO text anywhere. Painterly, emotionally resonant.`,
+};
 
-        if (!process.env.OPENAI_API_KEY) {
-            return NextResponse.json({
-                title: "The Enchanted Library",
-                title_translation: "The Enchanted Library",
-                content: `In a town nestled between silver mountains, there was a library where books could speak. Every evening, the old librarian would open the doors and children would come running. "Tell me a story," they would beg. The books would rustle their pages and begin. (Mock story — set OPENAI_API_KEY to generate real stories in ${language}.)`,
-                content_translation: "In a town nestled between silver mountains, there was a library where books could speak.",
-                imagePromptScene: "A glowing magical library at dusk, with floating books and golden light streaming from enchanted windows, children reading among towering bookshelves",
-                vocabulary: [
-                    { word: "biblioteca", translation: "library", definition: "A place where books are kept and can be borrowed.", part_of_speech: "noun", pronunciation: "/bi.blio.ˈte.ka/", example: "La biblioteca tiene miles de libros.", example_translation: "The library has thousands of books." },
-                    { word: "encantado", translation: "enchanted", definition: "Under a magical spell; filled with wonder.", part_of_speech: "adjective", pronunciation: "/en.kan.ˈta.ðo/", example: "El castillo estaba encantado.", example_translation: "The castle was enchanted." }
-                ],
-                exercises: []
-            });
-        }
+function buildPrompt(language, level, topic) {
+    const wordRange = { Beginner: '100-150', Intermediate: '200-250', Advanced: '300-400' }[level] || '200-250';
+    return `You are an award-winning author writing a ${level}-level ${language} story about "${topic}" for language learners. Think Hemingway's clarity, Roald Dahl's warmth, Studio Ghibli's wonder.
 
-        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+THE DETECTIVE PRINCIPLE: Grammar patterns are hidden clues — woven invisibly so learners absorb them naturally. Never announce a rule; demonstrate it 3-4 times.
 
-        const wordCountMap = { Beginner: '100-150', Intermediate: '200-250', Advanced: '300-400' };
-        const wordRange = wordCountMap[level] || '200-300';
+REQUIREMENTS:
+- Story body ENTIRELY in ${language} (no English in "content")
+- ${wordRange} words — tight, every sentence earns its place
+- Open with a vivid hook — drop the reader into tension, wonder, or curiosity
+- Grammar focus (${level}): ${grammarFocus[level] || grammarFocus.Intermediate}
+- Dialogue sounds like real speech, not textbook translations
+- Weave exactly 8-12 vocabulary words naturally
 
-        const grammarFocus = {
-            Beginner:     'present tense verbs, singular/plural nouns, basic adjective agreement. Use short punchy sentences. Repeat key grammar patterns 3-4 times so the learner absorbs them without noticing.',
-            Intermediate: 'past and future tenses side-by-side to show contrast, 1-2 idiomatic expressions used naturally, subordinate clauses (because/although/when). Let the grammar emerge through the story rather than instruction.',
-            Advanced:     'subjunctive mood, conditional sentences (if/would), passive voice, literary devices like metaphor and personification. Grammar should feel like a sophisticated author\'s stylistic choice, not a textbook example.',
-        };
+VOCABULARY: Memorable because of the emotional context they appear in. Include IPA phonetics for ${language}.
+IMAGE SCENE: One cinematic sentence — specific characters, setting, exact quality of light, emotional atmosphere.
+EXERCISES: Designed like puzzle pieces, not quizzes.
 
-        const systemPrompt = `You are an award-winning author who writes gripping, beautifully observed short stories for language learners. Your stories read like literature — not textbook exercises. Think the narrative clarity of Hemingway, the warmth of Roald Dahl, the wonder of Studio Ghibli.
-
-THE DETECTIVE PRINCIPLE: Just as a great detective story hides its clues in plain sight — grammar patterns should be woven invisibly into the prose. The learner discovers them naturally, like a reader piecing together a mystery. Never announce a grammar rule. Let the story demonstrate it 3-4 times so it lodges in memory.
-
-STORY REQUIREMENTS:
-- Write the story body ENTIRELY in ${language} (no English in the "content" field)
-- Target length: ${wordRange} words — tight and purposeful, every sentence earns its place
-- Open with a vivid hook — drop the reader into a moment of tension, wonder, or curiosity
-- Build through a clear arc: inciting incident → rising tension → satisfying resolution with emotional resonance
-- Grammar focus for this level (${level}): ${grammarFocus[level] || grammarFocus.Intermediate}
-- Dialogue must sound like real speech, not translated textbook sentences
-- Weave exactly 8-12 vocabulary words naturally — choose words the learner will want to use tomorrow
-
-VOCABULARY: Select words that are:
-- Memorable because of the emotional context they appear in (not just frequent)
-- Actually pivotal to the story — learner will double-click to discover them
-- Covering a range: 1-2 advanced words, mostly mid-frequency useful words
-- Provide IPA phonetic notation specific to ${language}
-
-IMAGE SCENE: Write one cinematic sentence describing the single most visually arresting moment — include the specific characters, their expressions, the exact setting, the quality of light, and the emotional atmosphere.
-
-EXERCISES: Designed like puzzle pieces, not quizzes:
-- comprehension: Ask about character motivation or a subtle plot detail — not obvious recall (4 options)
-- fill_in_blank: The missing word should be one the learner now understands from context
-- vocabulary: Test the nuanced meaning — use plausible distractors that share a superficial similarity
-- word_match: Pick 4 pairs where the connection surprises or delights the learner
-- word_scramble: Pick a 5-8 letter word from the story, provide a true anagram (double-check letter counts)
-- sentence_order: Use a sentence whose word order reveals something interesting about ${language} grammar
-
-Return ONLY valid JSON, no markdown, no code fences:
+Return ONLY valid JSON:
 {
   "title": "story title in ${language}",
-  "title_translation": "English translation of title",
-  "content": "full story text in ${language} (${wordRange} words)",
+  "title_translation": "English translation",
+  "content": "full story in ${language} (${wordRange} words)",
   "content_translation": "full English translation",
-  "imagePromptScene": "one vivid sentence describing the most beautiful visual moment in the story",
-  "vocabulary": [
-    {
-      "word": "word in ${language}",
-      "translation": "English meaning",
-      "definition": "clear English definition in 1 sentence",
-      "part_of_speech": "noun/verb/adjective/adverb/etc",
-      "pronunciation": "IPA phonetic notation for ${language}",
-      "example": "natural example sentence in ${language}",
-      "example_translation": "English translation of example"
-    }
-  ],
+  "imagePromptScene": "one vivid cinematic sentence",
+  "vocabulary": [{"word":"","translation":"","definition":"","part_of_speech":"","pronunciation":"","example":"","example_translation":""}],
   "exercises": [
-    { "type": "comprehension", "question": "question in English", "options": ["A","B","C","D"], "answer": "exact correct option text", "explanation": "why this is correct" },
-    { "type": "fill_in_blank", "question": "Complete: '___' in the context of the story", "answer": "the missing word in ${language}", "explanation": "brief explanation" },
-    { "type": "vocabulary", "question": "What does '[word]' mean in this story?", "options": ["correct","wrong1","wrong2"], "answer": "correct", "explanation": "context" },
-    { "type": "word_match", "instruction": "Match each ${language} word to its English meaning", "pairs": [{"word":"w1","translation":"t1"},{"word":"w2","translation":"t2"},{"word":"w3","translation":"t3"},{"word":"w4","translation":"t4"}] },
-    { "type": "word_scramble", "instruction": "Unscramble to find a word from the story", "scrambled": "ANAGRAM_OF_ANSWER", "answer": "the target word", "hint": "English hint about meaning" },
-    { "type": "sentence_order", "instruction": "Put the words in correct ${language} order", "words": ["w1","w2","w3","w4","w5"], "answer": "w1 w2 w3 w4 w5", "translation": "English translation" }
+    {"type":"comprehension","question":"","options":["","","",""],"answer":"","explanation":""},
+    {"type":"fill_in_blank","question":"","answer":"","explanation":""},
+    {"type":"vocabulary","question":"","options":["","",""],"answer":"","explanation":""},
+    {"type":"word_match","instruction":"","pairs":[{"word":"","translation":""},{"word":"","translation":""},{"word":"","translation":""},{"word":"","translation":""}]},
+    {"type":"word_scramble","instruction":"","scrambled":"","answer":"","hint":""},
+    {"type":"sentence_order","instruction":"","words":[],"answer":"","translation":""}
   ]
 }`;
+}
 
-        const completion = await openai.chat.completions.create({
-            messages: [{ role: "system", content: systemPrompt }],
-            model: "gpt-4o",
-            response_format: { type: "json_object" },
-            temperature: 0.85,
-        });
+const MOCK = {
+    title: 'La Biblioteca Encantada',
+    title_translation: 'The Enchanted Library',
+    content: 'En un pueblo entre montañas de plata, había una biblioteca donde los libros podían hablar. Cada tarde, el viejo bibliotecario abría las puertas y los niños corrían adentro. "Cuéntame una historia," pedían. Los libros susurraban sus páginas y comenzaban. (Mock — add OPENAI_API_KEY for real stories.)',
+    content_translation: 'In a town nestled between silver mountains, there was a library where books could speak.',
+    imagePromptScene: 'A glowing magical library at dusk, floating books and golden light streaming from enchanted windows, children reading among towering bookshelves',
+    vocabulary: [
+        { word: 'biblioteca', translation: 'library', definition: 'A place where books are kept.', part_of_speech: 'noun', pronunciation: '/bi.blio.ˈte.ka/', example: 'La biblioteca tiene miles de libros.', example_translation: 'The library has thousands of books.' },
+    ],
+    exercises: [],
+};
 
-        const result = JSON.parse(completion.choices[0].message.content);
-        return NextResponse.json(result);
+export async function POST(req) {
+    const { language, level, topic } = await req.json();
+    const enc = new TextEncoder();
 
-    } catch (error) {
-        console.error("Error generating story:", error);
-        return NextResponse.json({ error: "Failed to generate story" }, { status: 500 });
-    }
+    const stream = new ReadableStream({
+        async start(controller) {
+            const send = (obj) => controller.enqueue(enc.encode(`data: ${JSON.stringify(obj)}\n\n`));
+
+            // Mock mode
+            if (!process.env.OPENAI_API_KEY) {
+                for (const word of MOCK.content.split(' ')) {
+                    send({ type: 'token', text: word + ' ' });
+                }
+                const { content: _, ...meta } = MOCK;
+                send({ type: 'meta', ...meta });
+                send({ type: 'done' });
+                controller.close();
+                return;
+            }
+
+            try {
+                // ── 1. Stream story from GPT-4o ───────────────────────────
+                const gptRes = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+                    body: JSON.stringify({
+                        model: 'gpt-4o',
+                        stream: true,
+                        response_format: { type: 'json_object' },
+                        messages: [{ role: 'system', content: buildPrompt(language, level, topic) }],
+                        temperature: 0.85,
+                    }),
+                });
+
+                const reader = gptRes.body.getReader();
+                const dec = new TextDecoder();
+                let fullJson = '';
+                // State machine: find "content":" in the JSON stream, then forward chars
+                let lookBuf = '';
+                let inContent = false;
+                let escaped = false;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    const raw = dec.decode(value, { stream: true });
+
+                    for (const line of raw.split('\n')) {
+                        if (!line.startsWith('data: ')) continue;
+                        const payload = line.slice(6).trim();
+                        if (payload === '[DONE]') continue;
+                        try {
+                            const delta = JSON.parse(payload).choices?.[0]?.delta?.content ?? '';
+                            fullJson += delta;
+
+                            for (const ch of delta) {
+                                if (inContent) {
+                                    if (escaped) {
+                                        escaped = false;
+                                        if (ch === 'n') send({ type: 'token', text: '\n' });
+                                        else if (ch === '"') send({ type: 'token', text: '"' });
+                                        else if (ch === '\\') send({ type: 'token', text: '\\' });
+                                        else send({ type: 'token', text: ch });
+                                    } else if (ch === '\\') {
+                                        escaped = true;
+                                    } else if (ch === '"') {
+                                        inContent = false;
+                                    } else {
+                                        send({ type: 'token', text: ch });
+                                    }
+                                } else {
+                                    lookBuf += ch;
+                                    if (lookBuf.endsWith('"content":"')) { inContent = true; lookBuf = ''; }
+                                    else if (lookBuf.length > 15) lookBuf = lookBuf.slice(-15);
+                                }
+                            }
+                        } catch { /* skip malformed SSE line */ }
+                    }
+                }
+
+                // ── 2. Parse full JSON for metadata ──────────────────────
+                try {
+                    const parsed = JSON.parse(fullJson);
+                    const { content: _, ...meta } = parsed;
+                    send({ type: 'meta', ...meta });
+
+                    // ── 3. Generate illustration ──────────────────────────
+                    const scene = parsed.imagePromptScene;
+                    if (scene) {
+                        try {
+                            const styleFn = artStyle[level] || artStyle.Intermediate;
+                            const imgRes = await fetch('https://api.openai.com/v1/images/generations', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+                                body: JSON.stringify({ model: 'dall-e-3', prompt: styleFn(scene), n: 1, size: '1792x1024', quality: 'standard', style: 'natural' }),
+                            });
+                            const imgJson = await imgRes.json();
+                            const url = imgJson.data?.[0]?.url;
+                            if (url) send({ type: 'image', url });
+                        } catch (imgErr) { console.error('Image generation error:', imgErr.message); }
+                    }
+                } catch (parseErr) { console.error('JSON parse error:', parseErr.message); }
+
+                send({ type: 'done' });
+                controller.close();
+            } catch (err) {
+                console.error('Stream error:', err.message);
+                send({ type: 'error', message: err.message });
+                controller.close();
+            }
+        },
+    });
+
+    return new Response(stream, {
+        headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' },
+    });
 }

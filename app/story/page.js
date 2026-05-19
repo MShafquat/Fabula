@@ -872,29 +872,52 @@ function StoryContent() {
         if (!isLoggedIn && count >= FREE_LIMIT) { setBlocked(true); return; }
         setBlocked(false);
         setLoading(true);
+
+        let usageCounted = false;
+        let contentAcc = '';
+
         fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ language: lang, level, topic }),
-        })
-        .then(r => r.json())
-        .then(data => {
-            setStory(data);
-            if (!isLoggedIn) incrementDailyUsage();
-            // Fetch illustration separately (Edge runtime, up to 25s)
-            if (data.imagePromptScene) {
-                fetch('/api/image', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ scene: data.imagePromptScene, level }),
-                })
-                .then(r => r.json())
-                .then(img => { if (img.url) setStory(s => ({ ...s, imageUrl: img.url })); })
-                .catch(() => {});
+        }).then(async (res) => {
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder();
+            let buf = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                buf += decoder.decode(value, { stream: true });
+
+                // Process complete SSE messages (separated by \n\n)
+                const parts = buf.split('\n\n');
+                buf = parts.pop(); // keep incomplete tail
+
+                for (const part of parts) {
+                    const line = part.trim();
+                    if (!line.startsWith('data: ')) continue;
+                    try {
+                        const evt = JSON.parse(line.slice(6));
+
+                        if (evt.type === 'token') {
+                            contentAcc += evt.text;
+                            setLoading(false);
+                            setStory(s => ({ ...(s || { _partial: true }), content: contentAcc }));
+                        } else if (evt.type === 'meta') {
+                            const { type: _, ...meta } = evt;
+                            setStory(s => ({ ...(s || {}), ...meta, content: contentAcc }));
+                            if (!usageCounted && !isLoggedIn) { incrementDailyUsage(); usageCounted = true; }
+                        } else if (evt.type === 'image') {
+                            setStory(s => ({ ...s, imageUrl: evt.url }));
+                        } else if (evt.type === 'done') {
+                            setLoading(false);
+                        }
+                    } catch { /* skip malformed event */ }
+                }
             }
-        })
-        .catch(e => console.error(e))
-        .finally(() => setLoading(false));
+        }).catch(e => console.error(e))
+          .finally(() => setLoading(false));
     }, [lang, level, topic]);
 
     // Fetch once auth state is known
@@ -1108,34 +1131,39 @@ function StoryContent() {
                     borderTop: '4px solid #f59e0b',
                     marginBottom: '3rem',
                 }}>
-                    {/* Image */}
-                    {!story.imageUrl && story.imagePromptScene && (
-                        <div style={{
-                            marginBottom: '1.75rem', borderRadius: 16, overflow: 'hidden',
-                            aspectRatio: '1/1', background: 'linear-gradient(110deg,#f3e8ff 30%,#e0f2fe 50%,#f3e8ff 70%)',
-                            backgroundSize: '200% 100%', animation: 'shimmer 1.6s linear infinite',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>
-                            <p style={{ fontFamily: 'var(--font-playful)', color: '#a78bfa', fontSize: '.88rem' }}>✨ Painting your illustration…</p>
-                        </div>
-                    )}
-                    {story.imageUrl && (
-                        <div className="story-image-frame" style={{ marginBottom: '1.75rem', position: 'relative' }}>
-                            <img src={story.imageUrl} alt="Story illustration" style={{ width: '100%', height: 'auto', display: 'block' }} />
-                            <button onClick={toggleAudio} style={{
-                                position: 'absolute', bottom: '1rem', right: '1rem',
-                                background: 'rgba(124,58,237,.9)', color: 'white', border: 'none',
-                                borderRadius: '50%', width: 50, height: 50,
+                    {/* Banner illustration */}
+                    <div style={{ marginBottom: '1.75rem', borderRadius: 16, overflow: 'hidden', position: 'relative', height: 220 }}>
+                        {story.imageUrl ? (
+                            <>
+                                <img
+                                    src={story.imageUrl}
+                                    alt="Story illustration"
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                />
+                                <button onClick={toggleAudio} style={{
+                                    position: 'absolute', bottom: '.75rem', right: '.75rem',
+                                    background: 'rgba(124,58,237,.9)', color: 'white', border: 'none',
+                                    borderRadius: '50%', width: 44, height: 44,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,.25)',
+                                    transition: 'transform .2s', zIndex: 5,
+                                }}
+                                    onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1)'}
+                                    onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
+                                    {audioStatus === 'playing' ? <Pause size={20} fill="white" /> : <Play size={20} fill="white" />}
+                                </button>
+                            </>
+                        ) : (
+                            <div style={{
+                                width: '100%', height: '100%',
+                                background: 'linear-gradient(110deg,#f3e8ff 30%,#e0f2fe 50%,#f3e8ff 70%)',
+                                backgroundSize: '200% 100%', animation: 'shimmer 1.6s linear infinite',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,.2)',
-                                transition: 'transform .2s', zIndex: 5,
-                            }} title={audioStatus === 'playing' ? 'Pause' : 'Play story'}
-                               onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1)'}
-                               onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
-                                {audioStatus === 'playing' ? <Pause size={22} fill="white" /> : <Play size={22} fill="white" />}
-                            </button>
-                        </div>
-                    )}
+                            }}>
+                                <p style={{ fontFamily: 'var(--font-playful)', color: '#a78bfa', fontSize: '.88rem' }}>✨ Painting your illustration…</p>
+                            </div>
+                        )}
+                    </div>
 
                     {/* Title */}
                     <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
