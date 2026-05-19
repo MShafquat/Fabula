@@ -1,9 +1,9 @@
 'use client';
 
-import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
+import { Suspense, useEffect, useState, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2, ArrowLeft, Sparkles, Volume2, Play, Pause, Languages, Share2, BookMarked, X } from 'lucide-react';
+import { Loader2, ArrowLeft, Volume2, Play, Pause, Languages, Share2 } from 'lucide-react';
 
 // ─── Speech ───────────────────────────────────────────────────────────────────
 const langMap = {
@@ -98,10 +98,10 @@ function Confetti({ active }) {
 }
 
 // ─── Paywall Modal ────────────────────────────────────────────────────────────
-function PaywallModal({ lang, level, topic }) {
-    const [showPay, setShowPay] = useState(false);
-    const [txnId, setTxnId] = useState('');
-    const [submitted, setSubmitted] = useState(false);
+function PaywallModal() {
+    const [plan, setPlan] = useState('monthly');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const resetTime = (() => {
         const now = new Date();
@@ -112,6 +112,28 @@ function PaywallModal({ lang, level, topic }) {
         return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
     })();
 
+    async function handleCheckout() {
+        setLoading(true);
+        setError('');
+        try {
+            const res = await fetch('/api/payment/create-checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ plan }),
+            });
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                setError(data.error || 'Something went wrong. Please try again.');
+                setLoading(false);
+            }
+        } catch {
+            setError('Network error. Please try again.');
+            setLoading(false);
+        }
+    }
+
     return (
         <div style={{
             minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -120,7 +142,7 @@ function PaywallModal({ lang, level, topic }) {
         }}>
             <div style={{
                 background: 'white', borderRadius: 28, padding: '2.5rem',
-                maxWidth: 460, width: '100%', textAlign: 'center',
+                maxWidth: 480, width: '100%', textAlign: 'center',
                 boxShadow: '0 20px 60px rgba(124,58,237,.22)',
                 border: '2px solid rgba(124,58,237,.1)',
                 animation: 'popIn .4s ease-out',
@@ -130,101 +152,73 @@ function PaywallModal({ lang, level, topic }) {
                     Daily limit reached!
                 </h2>
                 <p style={{ color: '#64748b', fontFamily: 'var(--font-playful)', marginBottom: '.4rem', fontSize: '.95rem' }}>
-                    You've used all 3 free stories today.
+                    You&apos;ve used all 3 free stories today.
                 </p>
                 <p style={{ color: '#94a3b8', fontSize: '.82rem', fontFamily: 'var(--font-playful)', marginBottom: '1.75rem' }}>
                     Resets in <strong style={{ color: '#7c3aed' }}>{resetTime}</strong> — or unlock unlimited access now.
                 </p>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.75rem', marginBottom: '1.75rem' }}>
-                    <div style={{ background: '#f8fafc', borderRadius: 14, padding: '1rem', border: '2px solid #e2e8f0' }}>
-                        <p style={{ fontFamily: 'var(--font-playful)', fontWeight: 700, color: '#64748b', marginBottom: '.35rem', fontSize: '.85rem' }}>Free</p>
-                        <p style={{ fontSize: '1.4rem', fontWeight: 900, color: '#1e1b4b', fontFamily: 'var(--font-heading)' }}>3/day</p>
-                        <p style={{ fontSize: '.7rem', color: '#94a3b8', marginTop: '.2rem' }}>No account needed</p>
-                    </div>
-                    <div style={{ background: 'linear-gradient(135deg,rgba(124,58,237,.08),rgba(14,165,233,.08))', borderRadius: 14, padding: '1rem', border: '2px solid #7c3aed' }}>
-                        <p style={{ fontFamily: 'var(--font-playful)', fontWeight: 700, color: '#7c3aed', marginBottom: '.35rem', fontSize: '.85rem' }}>⭐ Premium</p>
-                        <p style={{ fontSize: '1.4rem', fontWeight: 900, color: '#1e1b4b', fontFamily: 'var(--font-heading)' }}>Unlimited</p>
-                        <p style={{ fontSize: '.7rem', color: '#7c3aed', marginTop: '.2rem', fontWeight: 600 }}>Only 299 ৳/month</p>
-                    </div>
+                {/* Plan toggle */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.75rem', marginBottom: '1.5rem' }}>
+                    {[
+                        { key: 'monthly', label: 'Monthly', price: '$4.99', sub: 'per month' },
+                        { key: 'yearly',  label: 'Yearly',  price: '$39.99', sub: 'per year · save 33%' },
+                    ].map(({ key, label, price, sub }) => (
+                        <button key={key} onClick={() => setPlan(key)} style={{
+                            background: plan === key
+                                ? 'linear-gradient(135deg,rgba(124,58,237,.1),rgba(14,165,233,.1))'
+                                : '#f8fafc',
+                            borderRadius: 14, padding: '1rem',
+                            border: plan === key ? '2px solid #7c3aed' : '2px solid #e2e8f0',
+                            cursor: 'pointer', textAlign: 'center',
+                        }}>
+                            <p style={{ fontFamily: 'var(--font-playful)', fontWeight: 700, color: plan === key ? '#7c3aed' : '#64748b', marginBottom: '.25rem', fontSize: '.85rem' }}>
+                                {plan === key ? '⭐ ' : ''}{label}
+                            </p>
+                            <p style={{ fontSize: '1.35rem', fontWeight: 900, color: '#1e1b4b', fontFamily: 'var(--font-heading)', marginBottom: '.15rem' }}>{price}</p>
+                            <p style={{ fontSize: '.68rem', color: plan === key ? '#7c3aed' : '#94a3b8', fontWeight: plan === key ? 600 : 400 }}>{sub}</p>
+                        </button>
+                    ))}
                 </div>
 
-                {!showPay ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '.65rem' }}>
-                        <button onClick={() => setShowPay(true)} style={{
-                            padding: '.875rem 2rem',
-                            background: 'linear-gradient(135deg,#7c3aed,#0ea5e9)',
-                            color: 'white', border: 'none', borderRadius: 14,
-                            fontFamily: 'var(--font-playful)', fontWeight: 700, fontSize: '1rem',
-                            cursor: 'pointer', boxShadow: '0 8px 24px rgba(124,58,237,.35)',
-                        }}>
-                            🌟 Unlock Premium — 299 ৳/month
-                        </button>
-                        <Link href="/" style={{
-                            display: 'block', padding: '.7rem',
-                            color: '#94a3b8', fontFamily: 'var(--font-playful)',
-                            fontSize: '.88rem', textDecoration: 'none',
-                        }}>
-                            ← Back to home · Try again in {resetTime}
-                        </Link>
-                    </div>
-                ) : submitted ? (
-                    <div style={{ textAlign: 'center', padding: '1rem' }}>
-                        <div style={{ fontSize: '2.5rem', marginBottom: '.5rem' }}>🎉</div>
-                        <p style={{ fontFamily: 'var(--font-playful)', color: '#15803d', fontWeight: 700, marginBottom: '.4rem' }}>
-                            Payment submitted!
-                        </p>
-                        <p style={{ fontSize: '.82rem', color: '#64748b', fontFamily: 'var(--font-playful)' }}>
-                            We'll verify within a few hours and activate your account. Come back soon!
-                        </p>
-                    </div>
-                ) : (
-                    <div style={{ textAlign: 'left' }}>
-                        <p style={{ fontFamily: 'var(--font-playful)', fontWeight: 700, color: '#1e1b4b', marginBottom: '1rem', fontSize: '.92rem' }}>
-                            Send 299 ৳ via mobile banking:
-                        </p>
-                        <div style={{ background: '#fce7f3', borderRadius: 12, padding: '.9rem', marginBottom: '.6rem', border: '1px solid #f9a8d4' }}>
-                            <p style={{ fontFamily: 'var(--font-playful)', fontWeight: 700, color: '#db2777', marginBottom: '.25rem', fontSize: '.88rem' }}>📱 bKash — Send Money</p>
-                            <p style={{ fontSize: '.82rem', color: '#666', fontFamily: 'var(--font-ui)' }}>Number: <strong>01XXXXXXXXX</strong></p>
-                            <p style={{ fontSize: '.72rem', color: '#999', fontFamily: 'var(--font-ui)' }}>Reference: "Fabula Premium"</p>
-                        </div>
-                        <div style={{ background: '#fff7ed', borderRadius: 12, padding: '.9rem', marginBottom: '1rem', border: '1px solid #fed7aa' }}>
-                            <p style={{ fontFamily: 'var(--font-playful)', fontWeight: 700, color: '#ea580c', marginBottom: '.25rem', fontSize: '.88rem' }}>💳 Nagad — Send Money</p>
-                            <p style={{ fontSize: '.82rem', color: '#666', fontFamily: 'var(--font-ui)' }}>Number: <strong>01XXXXXXXXX</strong></p>
-                        </div>
-                        <label style={{ fontFamily: 'var(--font-playful)', fontSize: '.83rem', color: '#555', display: 'block', marginBottom: '.35rem' }}>
-                            Your Transaction ID:
-                        </label>
-                        <input
-                            type="text" placeholder="e.g. 8FG4J2K1..."
-                            value={txnId} onChange={e => setTxnId(e.target.value)}
-                            style={{
-                                width: '100%', padding: '.7rem 1rem', borderRadius: 10,
-                                border: '2px solid #e2e8f0', fontFamily: 'var(--font-playful)',
-                                fontSize: '.92rem', marginBottom: '.7rem', outline: 'none',
-                            }}
-                            onFocus={e => e.target.style.borderColor = '#7c3aed'}
-                            onBlur={e => e.target.style.borderColor = '#e2e8f0'}
-                        />
-                        <button
-                            disabled={!txnId.trim()}
-                            onClick={() => setSubmitted(true)}
-                            style={{
-                                width: '100%', padding: '.75rem',
-                                background: txnId.trim() ? '#7c3aed' : '#d1d5db',
-                                color: 'white', border: 'none', borderRadius: 10,
-                                fontFamily: 'var(--font-playful)', fontWeight: 700,
-                                fontSize: '.92rem', cursor: txnId.trim() ? 'pointer' : 'default',
-                                marginBottom: '.5rem',
-                            }}
-                        >
-                            Submit Payment
-                        </button>
-                        <button onClick={() => setShowPay(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '.78rem', cursor: 'pointer', fontFamily: 'var(--font-playful)' }}>
-                            ← Back
-                        </button>
-                    </div>
+                {/* Benefits */}
+                <div style={{ background: 'linear-gradient(135deg,rgba(124,58,237,.05),rgba(14,165,233,.05))', borderRadius: 14, padding: '1rem', marginBottom: '1.5rem', textAlign: 'left' }}>
+                    {['Unlimited stories every day', 'All 38 languages', 'HD illustrated stories', 'Full exercise suite', 'Cancel anytime'].map(b => (
+                        <p key={b} style={{ fontFamily: 'var(--font-playful)', fontSize: '.83rem', color: '#1e1b4b', marginBottom: '.25rem' }}>✅ {b}</p>
+                    ))}
+                </div>
+
+                {error && (
+                    <p style={{ color: '#e11d48', fontSize: '.82rem', fontFamily: 'var(--font-playful)', marginBottom: '.75rem' }}>{error}</p>
                 )}
+
+                <button
+                    onClick={handleCheckout}
+                    disabled={loading}
+                    style={{
+                        width: '100%', padding: '1rem 2rem',
+                        background: loading ? '#d1d5db' : 'linear-gradient(135deg,#7c3aed,#0ea5e9)',
+                        color: 'white', border: 'none', borderRadius: 14,
+                        fontFamily: 'var(--font-playful)', fontWeight: 700, fontSize: '1rem',
+                        cursor: loading ? 'default' : 'pointer',
+                        boxShadow: loading ? 'none' : '0 8px 24px rgba(124,58,237,.35)',
+                        marginBottom: '.75rem', transition: 'opacity .2s',
+                    }}
+                >
+                    {loading ? '⏳ Redirecting to checkout…' : `🌟 Unlock Premium — ${plan === 'yearly' ? '$39.99/yr' : '$4.99/mo'}`}
+                </button>
+
+                <p style={{ fontSize: '.7rem', color: '#94a3b8', fontFamily: 'var(--font-playful)', marginBottom: '.75rem' }}>
+                    Secured by Stripe · Cancel anytime · Instant access
+                </p>
+
+                <Link href="/" style={{
+                    display: 'block', padding: '.5rem',
+                    color: '#94a3b8', fontFamily: 'var(--font-playful)',
+                    fontSize: '.85rem', textDecoration: 'none',
+                }}>
+                    ← Back to home · Try again in {resetTime}
+                </Link>
             </div>
         </div>
     );
