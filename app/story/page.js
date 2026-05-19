@@ -140,31 +140,32 @@ function AuthModal({ onSuccess }) {
 
     const inputStyle = {
         width: '100%', padding: '.75rem 1rem', borderRadius: 12,
-        border: '2px solid #e2e8f0', fontFamily: 'var(--font-playful)',
+        border: '2px solid rgba(255,255,255,0.1)', fontFamily: 'var(--font-playful)',
         fontSize: '.95rem', outline: 'none', boxSizing: 'border-box',
-        transition: 'border-color .2s',
+        transition: 'border-color .2s', background: 'rgba(255,255,255,0.05)',
+        color: '#ede9ff',
     };
 
     return (
         <div style={{
             minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'linear-gradient(160deg,#fdf6e3 0%,#f3e8ff 50%,#e0f2fe 100%)',
+            background: 'linear-gradient(160deg,#0e0b1e 0%,#130d2a 50%,#0b1220 100%)',
             padding: '2rem',
         }}>
             <div style={{
-                background: 'white', borderRadius: 28, padding: '2.5rem',
+                background: '#1a1630', borderRadius: 28, padding: '2.5rem',
                 maxWidth: 440, width: '100%', textAlign: 'center',
-                boxShadow: '0 20px 60px rgba(124,58,237,.22)',
-                border: '2px solid rgba(124,58,237,.1)',
+                boxShadow: '0 20px 60px rgba(0,0,0,.5)',
+                border: '1.5px solid rgba(139,92,246,.2)',
                 animation: 'popIn .4s ease-out',
             }}>
                 {done ? (
                     <>
                         <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>📬</div>
-                        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: '#7c3aed', marginBottom: '.5rem' }}>
+                        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: '#a78bfa', marginBottom: '.5rem' }}>
                             Check your email
                         </h2>
-                        <p style={{ color: '#64748b', fontFamily: 'var(--font-playful)', fontSize: '.92rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+                        <p style={{ color: '#7b749e', fontFamily: 'var(--font-playful)', fontSize: '.92rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
                             We sent a confirmation link to <strong>{email}</strong>. Click it, then come back and sign in.
                         </p>
                         <button onClick={() => { setDone(false); setTab('signin'); }} style={{
@@ -176,25 +177,24 @@ function AuthModal({ onSuccess }) {
                 ) : (
                     <>
                         <div style={{ fontSize: '3rem', marginBottom: '.75rem' }}>📚</div>
-                        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.65rem', color: '#7c3aed', marginBottom: '.35rem' }}>
-                            {tab === 'signup' ? 'Create a free account' : 'Welcome back!'}
+                        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.65rem', color: '#a78bfa', marginBottom: '.35rem' }}>
+                            {tab === 'signup' ? 'Create a free account' : 'Welcome back'}
                         </h2>
-                        <p style={{ color: '#64748b', fontFamily: 'var(--font-playful)', fontSize: '.88rem', marginBottom: '1.5rem' }}>
+                        <p style={{ color: '#7b749e', fontFamily: 'var(--font-playful)', fontSize: '.88rem', marginBottom: '1.5rem' }}>
                             {tab === 'signup'
                                 ? 'Free account = unlimited stories, all languages, forever.'
                                 : `Daily limit reached. Sign in to keep reading. Resets in ${resetTime}.`}
                         </p>
 
                         {/* Tab switcher */}
-                        <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 12, padding: '.25rem', marginBottom: '1.5rem' }}>
+                        <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: '.25rem', marginBottom: '1.5rem' }}>
                             {[['signup','Sign up'],['signin','Sign in']].map(([key, label]) => (
                                 <button key={key} onClick={() => { setTab(key); setError(''); }} style={{
                                     flex: 1, padding: '.55rem', border: 'none', borderRadius: 10,
-                                    background: tab === key ? 'white' : 'transparent',
-                                    color: tab === key ? '#7c3aed' : '#64748b',
+                                    background: tab === key ? 'rgba(139,92,246,0.2)' : 'transparent',
+                                    color: tab === key ? '#c4b5fd' : '#6b6494',
                                     fontFamily: 'var(--font-playful)', fontWeight: tab === key ? 700 : 500,
                                     fontSize: '.88rem', cursor: 'pointer',
-                                    boxShadow: tab === key ? '0 2px 8px rgba(0,0,0,.08)' : 'none',
                                     transition: 'all .2s',
                                 }}>{label}</button>
                             ))}
@@ -202,25 +202,25 @@ function AuthModal({ onSuccess }) {
 
                         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '.75rem', textAlign: 'left' }}>
                             <div>
-                                <label style={{ fontFamily: 'var(--font-playful)', fontSize: '.8rem', color: '#64748b', display: 'block', marginBottom: '.3rem' }}>Email</label>
+                                <label style={{ fontFamily: 'var(--font-playful)', fontSize: '.8rem', color: '#7b749e', display: 'block', marginBottom: '.3rem' }}>Email</label>
                                 <input
                                     type="email" required value={email}
                                     onChange={e => setEmail(e.target.value)}
                                     placeholder="you@example.com"
                                     style={inputStyle}
-                                    onFocus={e => e.target.style.borderColor = '#7c3aed'}
-                                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                                    onFocus={e => e.target.style.borderColor = '#8b5cf6'}
+                                    onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
                                 />
                             </div>
                             <div>
-                                <label style={{ fontFamily: 'var(--font-playful)', fontSize: '.8rem', color: '#64748b', display: 'block', marginBottom: '.3rem' }}>Password</label>
+                                <label style={{ fontFamily: 'var(--font-playful)', fontSize: '.8rem', color: '#7b749e', display: 'block', marginBottom: '.3rem' }}>Password</label>
                                 <input
                                     type="password" required value={password}
                                     onChange={e => setPassword(e.target.value)}
                                     placeholder={tab === 'signup' ? 'At least 6 characters' : 'Your password'}
                                     style={inputStyle}
-                                    onFocus={e => e.target.style.borderColor = '#7c3aed'}
-                                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                                    onFocus={e => e.target.style.borderColor = '#8b5cf6'}
+                                    onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
                                 />
                             </div>
 
@@ -241,7 +241,7 @@ function AuthModal({ onSuccess }) {
                             </button>
                         </form>
 
-                        <p style={{ marginTop: '1.25rem', fontSize: '.72rem', color: '#94a3b8', fontFamily: 'var(--font-playful)' }}>
+                        <p style={{ marginTop: '1.25rem', fontSize: '.72rem', color: '#5c587a', fontFamily: 'var(--font-playful)' }}>
                             Free forever · No credit card needed
                         </p>
 
@@ -270,7 +270,7 @@ const WordPopup = ({ wordData, position, onClose, isLoading, lang }) => {
         }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '.65rem' }}>
                 {isLoading ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', color: '#555' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', color: '#9990c4' }}>
                         <Loader2 style={{ animation: 'spin 1s linear infinite' }} size={15} />
                         <span style={{ fontSize: '.85rem', fontFamily: 'var(--font-playful)' }}>Looking it up...</span>
                     </div>
@@ -278,28 +278,28 @@ const WordPopup = ({ wordData, position, onClose, isLoading, lang }) => {
                     <>
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem' }}>
-                                <h4 style={{ fontSize: '1.2rem', color: '#7c3aed', fontWeight: 700 }}>{wordData.word}</h4>
-                                <button onClick={() => speak(wordData.word, targetLang)} style={{ background: 'none', border: 'none', color: '#7c3aed', cursor: 'pointer', padding: '.1rem' }} title="Listen">
+                                <h4 style={{ fontSize: '1.2rem', color: '#a78bfa', fontWeight: 700 }}>{wordData.word}</h4>
+                                <button onClick={() => speak(wordData.word, targetLang)} style={{ background: 'none', border: 'none', color: '#a78bfa', cursor: 'pointer', padding: '.1rem' }} title="Listen">
                                     <Volume2 size={15} />
                                 </button>
                             </div>
-                            <span style={{ fontSize: '.7rem', fontFamily: 'var(--font-playful)', background: '#f1f5f9', padding: '.18rem .5rem', borderRadius: 4, color: '#64748b', display: 'inline-block', marginTop: '.2rem' }}>{wordData.part_of_speech}</span>
+                            <span style={{ fontSize: '.7rem', fontFamily: 'var(--font-playful)', background: 'rgba(255,255,255,0.06)', padding: '.18rem .5rem', borderRadius: 4, color: '#7b749e', display: 'inline-block', marginTop: '.2rem' }}>{wordData.part_of_speech}</span>
                         </div>
-                        <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '1.1rem', padding: '.15rem' }}>✕</button>
+                        <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#6b6494', cursor: 'pointer', fontSize: '1.1rem', padding: '.15rem' }}>✕</button>
                     </>
                 )}
             </div>
             {!isLoading && wordData && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '.6rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: '1px solid rgba(0,0,0,.05)', paddingBottom: '.4rem' }}>
-                        <p style={{ fontSize: '.8rem', fontFamily: 'monospace', color: '#64748b' }}>{wordData.pronunciation}</p>
-                        <p style={{ fontStyle: 'italic', color: '#7c3aed', fontSize: '1rem', fontWeight: 600 }}>{wordData.translation}</p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: '1px solid rgba(255,255,255,.06)', paddingBottom: '.4rem' }}>
+                        <p style={{ fontSize: '.8rem', fontFamily: 'monospace', color: '#6b6494' }}>{wordData.pronunciation}</p>
+                        <p style={{ fontStyle: 'italic', color: '#a78bfa', fontSize: '1rem', fontWeight: 600 }}>{wordData.translation}</p>
                     </div>
-                    <p style={{ fontSize: '.9rem', color: '#334155', lineHeight: 1.5 }}>{wordData.definition}</p>
+                    <p style={{ fontSize: '.9rem', color: '#c8c2ee', lineHeight: 1.5 }}>{wordData.definition}</p>
                     {wordData.example && (
-                        <div style={{ background: '#fafafa', padding: '.65rem', borderRadius: 8, fontSize: '.82rem', color: '#555', borderLeft: '3px solid #c4b5fd' }}>
+                        <div style={{ background: 'rgba(139,92,246,0.08)', padding: '.65rem', borderRadius: 8, fontSize: '.82rem', color: '#9990c4', borderLeft: '3px solid rgba(139,92,246,0.4)' }}>
                             <p style={{ fontStyle: 'italic', marginBottom: '.2rem' }}>"{wordData.example}"</p>
-                            {wordData.example_translation && <p style={{ color: '#94a3b8', fontSize: '.75rem' }}>{wordData.example_translation}</p>}
+                            {wordData.example_translation && <p style={{ color: '#6b6494', fontSize: '.75rem' }}>{wordData.example_translation}</p>}
                         </div>
                     )}
                 </div>
@@ -343,11 +343,11 @@ function ClassicExercise({ exercise: ex, index: i, onAnswer }) {
             {ex.type !== 'fill_in_blank' && ex.options && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '.6rem' }}>
                     {ex.options.map((opt, j) => {
-                        let bg = 'white', borderColor = '#e2e8f0', color = '#1e1b4b', anim = 'none', opacity = 1;
+                        let bg = 'rgba(255,255,255,0.04)', borderColor = 'rgba(255,255,255,0.1)', color = '#c8c2ee', anim = 'none', opacity = 1;
                         if (selected) {
-                            if (opt === ex.answer)  { bg = '#dcfce7'; borderColor = '#16a34a'; color = '#166534'; }
-                            else if (opt === selected){ bg = '#fee2e2'; borderColor = '#dc2626'; color = '#991b1b'; anim = 'shake .5s ease'; }
-                            else opacity = .45;
+                            if (opt === ex.answer)  { bg = 'rgba(52,211,153,0.12)'; borderColor = 'rgba(52,211,153,0.4)'; color = '#34d399'; }
+                            else if (opt === selected){ bg = 'rgba(248,113,113,0.12)'; borderColor = 'rgba(248,113,113,0.4)'; color = '#f87171'; anim = 'shake .5s ease'; }
+                            else opacity = .35;
                         }
                         return (
                             <button key={j} disabled={!!selected}
@@ -375,12 +375,13 @@ function ClassicExercise({ exercise: ex, index: i, onAnswer }) {
                         onKeyDown={e => { if (e.key === 'Enter' && fillValue.trim() && !selected) handleFill(fillValue); }}
                         style={{
                             width: '100%', padding: '.7rem 1rem', fontSize: '.95rem',
-                            borderRadius: 12, border: '2px solid #e2e8f0',
+                            borderRadius: 12, border: '2px solid rgba(255,255,255,0.1)',
                             fontFamily: 'var(--font-playful)', marginBottom: '.65rem',
                             opacity: selected ? .5 : 1, outline: 'none',
+                            background: 'rgba(255,255,255,0.05)', color: '#ede9ff',
                         }}
-                        onFocus={e => e.target.style.borderColor = '#7c3aed'}
-                        onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                        onFocus={e => e.target.style.borderColor = '#8b5cf6'}
+                        onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
                     />
                     {!selected && (
                         <button onClick={() => handleFill(fillValue)} disabled={!fillValue.trim()} style={{
@@ -396,15 +397,15 @@ function ClassicExercise({ exercise: ex, index: i, onAnswer }) {
             {selected && (
                 <div style={{
                     marginTop: '.9rem', padding: '.9rem', borderRadius: 12,
-                    background: isCorrect ? '#f0fdf4' : '#fef2f2',
-                    border: `2px solid ${isCorrect ? '#86efac' : '#fecaca'}`,
+                    background: isCorrect ? 'rgba(52,211,153,0.08)' : 'rgba(248,113,113,0.08)',
+                    border: `1.5px solid ${isCorrect ? 'rgba(52,211,153,0.3)' : 'rgba(248,113,113,0.3)'}`,
                     animation: 'popIn .3s ease-out',
                 }}>
-                    <p style={{ fontWeight: 700, color: isCorrect ? '#22c55e' : '#ef4444', fontFamily: 'var(--font-playful)', marginBottom: '.25rem' }}>
-                        {isCorrect ? '🌟 Brilliant!' : '❌ Not quite'}
+                    <p style={{ fontWeight: 700, color: isCorrect ? '#34d399' : '#f87171', fontFamily: 'var(--font-playful)', marginBottom: '.25rem' }}>
+                        {isCorrect ? 'Correct!' : 'Not quite'}
                     </p>
-                    {ex.explanation && <p style={{ fontSize: '.83rem', color: isCorrect ? '#15803d' : '#991b1b', fontFamily: 'var(--font-playful)' }}>{ex.explanation}</p>}
-                    {!isCorrect && <p style={{ fontSize: '.83rem', color: '#991b1b', fontWeight: 700, fontFamily: 'var(--font-playful)', marginTop: '.25rem' }}>Answer: <em>{ex.answer}</em></p>}
+                    {ex.explanation && <p style={{ fontSize: '.83rem', color: isCorrect ? '#34d399' : '#f87171', fontFamily: 'var(--font-playful)' }}>{ex.explanation}</p>}
+                    {!isCorrect && <p style={{ fontSize: '.83rem', color: '#f87171', fontWeight: 700, fontFamily: 'var(--font-playful)', marginTop: '.25rem' }}>Answer: <em>{ex.answer}</em></p>}
                 </div>
             )}
         </div>
@@ -451,9 +452,10 @@ function WordMatchExercise({ exercise, index, onAnswer }) {
                             disabled={matched[wIdx] !== undefined || done}
                             style={{
                                 padding: '.65rem .9rem', borderRadius: 12, border: '2px solid',
-                                borderColor: matched[wIdx] !== undefined ? '#16a34a' : selectedWord === wIdx ? '#7c3aed' : '#e2e8f0',
-                                background: matched[wIdx] !== undefined ? '#dcfce7' : selectedWord === wIdx ? 'rgba(124,58,237,.06)' : 'white',
+                                borderColor: matched[wIdx] !== undefined ? 'rgba(52,211,153,0.4)' : selectedWord === wIdx ? '#8b5cf6' : 'rgba(255,255,255,0.1)',
+                                background: matched[wIdx] !== undefined ? 'rgba(52,211,153,0.12)' : selectedWord === wIdx ? 'rgba(139,92,246,.12)' : 'rgba(255,255,255,0.04)',
                                 fontFamily: 'var(--font-playful)', fontWeight: 700, fontSize: '.92rem',
+                                color: matched[wIdx] !== undefined ? '#34d399' : selectedWord === wIdx ? '#c4b5fd' : '#c8c2ee',
                                 cursor: matched[wIdx] !== undefined || done ? 'default' : 'pointer',
                                 transition: 'all .2s', animation: shakeW === wIdx ? 'shake .5s ease' : 'none',
                                 opacity: matched[wIdx] !== undefined ? .7 : 1,
@@ -468,8 +470,9 @@ function WordMatchExercise({ exercise, index, onAnswer }) {
                             disabled={matchedT.has(tIdx) || done}
                             style={{
                                 padding: '.65rem .9rem', borderRadius: 12, border: '2px solid',
-                                borderColor: matchedT.has(tIdx) ? '#16a34a' : '#e2e8f0',
-                                background: matchedT.has(tIdx) ? '#dcfce7' : 'white',
+                                borderColor: matchedT.has(tIdx) ? 'rgba(52,211,153,0.4)' : 'rgba(255,255,255,0.1)',
+                                background: matchedT.has(tIdx) ? 'rgba(52,211,153,0.12)' : 'rgba(255,255,255,0.04)',
+                                color: matchedT.has(tIdx) ? '#34d399' : '#c8c2ee',
                                 fontFamily: 'var(--font-playful)', fontWeight: 500, fontSize: '.88rem',
                                 cursor: matchedT.has(tIdx) || done ? 'default' : 'pointer',
                                 transition: 'all .2s', animation: shakeT === tIdx ? 'shake .5s ease' : 'none',
@@ -481,8 +484,8 @@ function WordMatchExercise({ exercise, index, onAnswer }) {
                 </div>
             </div>
             {done && (
-                <div style={{ marginTop: '.75rem', padding: '.9rem', borderRadius: 12, background: '#f0fdf4', border: '2px solid #86efac', textAlign: 'center', fontFamily: 'var(--font-playful)', fontWeight: 700, color: '#22c55e', animation: 'popIn .3s ease-out' }}>
-                    🎉 All matched! Perfect!
+                <div style={{ marginTop: '.75rem', padding: '.9rem', borderRadius: 12, background: 'rgba(52,211,153,0.08)', border: '1.5px solid rgba(52,211,153,0.3)', textAlign: 'center', fontFamily: 'var(--font-playful)', fontWeight: 700, color: '#34d399', animation: 'popIn .3s ease-out' }}>
+                    All matched!
                 </div>
             )}
         </div>
@@ -541,9 +544,9 @@ function WordScrambleExercise({ exercise, index, onAnswer }) {
                 </div>
             )}
             {result && (
-                <div style={{ marginTop: '.5rem', padding: '.9rem', borderRadius: 12, background: result === 'correct' ? '#f0fdf4' : '#fef2f2', border: `2px solid ${result === 'correct' ? '#86efac' : '#fecaca'}`, textAlign: 'center', fontFamily: 'var(--font-playful)', animation: 'popIn .3s ease-out' }}>
-                    <p style={{ fontWeight: 700, color: result === 'correct' ? '#22c55e' : '#ef4444' }}>{result === 'correct' ? '🎉 Perfect!' : '❌ Not quite!'}</p>
-                    {result === 'wrong' && <p style={{ fontSize: '.82rem', color: '#991b1b', marginTop: '.2rem' }}>The word was: <strong>{exercise.answer}</strong></p>}
+                <div style={{ marginTop: '.5rem', padding: '.9rem', borderRadius: 12, background: result === 'correct' ? 'rgba(52,211,153,0.08)' : 'rgba(248,113,113,0.08)', border: `1.5px solid ${result === 'correct' ? 'rgba(52,211,153,0.3)' : 'rgba(248,113,113,0.3)'}`, textAlign: 'center', fontFamily: 'var(--font-playful)', animation: 'popIn .3s ease-out' }}>
+                    <p style={{ fontWeight: 700, color: result === 'correct' ? '#34d399' : '#f87171' }}>{result === 'correct' ? 'Perfect!' : 'Not quite!'}</p>
+                    {result === 'wrong' && <p style={{ fontSize: '.82rem', color: '#f87171', marginTop: '.2rem' }}>The word was: <strong>{exercise.answer}</strong></p>}
                 </div>
             )}
         </div>
@@ -613,9 +616,9 @@ function SentenceOrderExercise({ exercise, index, onAnswer }) {
                 </div>
             )}
             {result && (
-                <div style={{ marginTop: '.5rem', padding: '.9rem', borderRadius: 12, background: result === 'correct' ? '#f0fdf4' : '#fef2f2', border: `2px solid ${result === 'correct' ? '#86efac' : '#fecaca'}`, textAlign: 'center', fontFamily: 'var(--font-playful)', animation: 'popIn .3s ease-out' }}>
-                    <p style={{ fontWeight: 700, color: result === 'correct' ? '#22c55e' : '#ef4444' }}>{result === 'correct' ? '🎉 Perfect sentence!' : '❌ Almost!'}</p>
-                    {result === 'wrong' && <p style={{ fontSize: '.82rem', color: '#991b1b', marginTop: '.2rem' }}>Correct: <strong>{exercise.answer}</strong></p>}
+                <div style={{ marginTop: '.5rem', padding: '.9rem', borderRadius: 12, background: result === 'correct' ? 'rgba(52,211,153,0.08)' : 'rgba(248,113,113,0.08)', border: `1.5px solid ${result === 'correct' ? 'rgba(52,211,153,0.3)' : 'rgba(248,113,113,0.3)'}`, textAlign: 'center', fontFamily: 'var(--font-playful)', animation: 'popIn .3s ease-out' }}>
+                    <p style={{ fontWeight: 700, color: result === 'correct' ? '#34d399' : '#f87171' }}>{result === 'correct' ? 'Perfect sentence!' : 'Almost!'}</p>
+                    {result === 'wrong' && <p style={{ fontSize: '.82rem', color: '#f87171', marginTop: '.2rem' }}>Correct: <strong>{exercise.answer}</strong></p>}
                 </div>
             )}
         </div>
@@ -651,40 +654,40 @@ function VocabCard({ vocab, lang, flipped, onFlip }) {
                 {/* Front */}
                 <div style={{
                     position: 'absolute', inset: 0, backfaceVisibility: 'hidden',
-                    background: 'white', borderRadius: 18, padding: '1.5rem',
+                    background: '#1a1630', borderRadius: 18, padding: '1.5rem',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                    textAlign: 'center', boxShadow: '0 4px 16px rgba(0,0,0,.06)',
-                    border: '1.5px solid rgba(124,58,237,.1)',
+                    textAlign: 'center', boxShadow: '0 4px 16px rgba(0,0,0,.3)',
+                    border: '1.5px solid rgba(139,92,246,.2)',
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.5rem' }}>
-                        <h4 style={{ fontSize: '1.7rem', color: '#7c3aed', fontWeight: 700, wordBreak: 'break-word' }}>{vocab.word}</h4>
-                        <button onClick={e => { e.stopPropagation(); speak(vocab.word, lang); }} style={{ background: 'none', border: 'none', color: '#7c3aed', cursor: 'pointer' }}>
+                        <h4 style={{ fontSize: '1.7rem', color: '#a78bfa', fontWeight: 700, wordBreak: 'break-word' }}>{vocab.word}</h4>
+                        <button onClick={e => { e.stopPropagation(); speak(vocab.word, lang); }} style={{ background: 'none', border: 'none', color: '#a78bfa', cursor: 'pointer' }}>
                             <Volume2 size={20} />
                         </button>
                     </div>
-                    <p style={{ fontFamily: 'monospace', fontSize: '.78rem', color: '#94a3b8', marginBottom: '.65rem' }}>{vocab.pronunciation}</p>
-                    <span style={{ fontSize: '.72rem', fontFamily: 'var(--font-playful)', background: '#f1f5f9', padding: '.2rem .6rem', borderRadius: 4, color: '#64748b', fontWeight: 700 }}>{vocab.part_of_speech}</span>
-                    <p style={{ marginTop: '1.25rem', fontSize: '.82rem', color: '#94a3b8', fontFamily: 'var(--font-playful)' }}>Tap to reveal meaning</p>
+                    <p style={{ fontFamily: 'monospace', fontSize: '.78rem', color: '#6b6494', marginBottom: '.65rem' }}>{vocab.pronunciation}</p>
+                    <span style={{ fontSize: '.72rem', fontFamily: 'var(--font-playful)', background: 'rgba(255,255,255,0.06)', padding: '.2rem .6rem', borderRadius: 4, color: '#7b749e', fontWeight: 700 }}>{vocab.part_of_speech}</span>
+                    <p style={{ marginTop: '1.25rem', fontSize: '.82rem', color: '#5c587a', fontFamily: 'var(--font-playful)' }}>Tap to reveal meaning</p>
                 </div>
                 {/* Back */}
                 <div style={{
                     position: 'absolute', inset: 0, backfaceVisibility: 'hidden',
                     transform: 'rotateY(180deg)',
-                    background: 'linear-gradient(135deg,#f8f4ff,#f0f9ff)',
+                    background: 'linear-gradient(135deg,#1e1a35,#16132b)',
                     borderRadius: 18, padding: '1.5rem',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                    textAlign: 'center', boxShadow: '0 4px 16px rgba(0,0,0,.06)',
-                    border: '1.5px solid rgba(124,58,237,.15)',
+                    textAlign: 'center', boxShadow: '0 4px 16px rgba(0,0,0,.3)',
+                    border: '1.5px solid rgba(139,92,246,.25)',
                 }}>
-                    <p style={{ fontSize: '1.35rem', fontStyle: 'italic', color: '#334155', fontWeight: 600, marginBottom: '.75rem' }}>{vocab.translation}</p>
-                    <p style={{ fontSize: '.88rem', color: '#475569', lineHeight: 1.6, marginBottom: '1rem' }}>{vocab.definition}</p>
+                    <p style={{ fontSize: '1.35rem', fontStyle: 'italic', color: '#ede9ff', fontWeight: 600, marginBottom: '.75rem' }}>{vocab.translation}</p>
+                    <p style={{ fontSize: '.88rem', color: '#9990c4', lineHeight: 1.6, marginBottom: '1rem' }}>{vocab.definition}</p>
                     {vocab.example && (
-                        <div style={{ background: 'rgba(255,255,255,.7)', padding: '.75rem', borderRadius: 10, borderLeft: '3px solid #c4b5fd', textAlign: 'left', width: '100%' }}>
-                            <p style={{ fontSize: '.8rem', fontStyle: 'italic', color: '#475569', marginBottom: '.2rem' }}>"{vocab.example}"</p>
-                            {vocab.example_translation && <p style={{ fontSize: '.72rem', color: '#94a3b8' }}>— {vocab.example_translation}</p>}
+                        <div style={{ background: 'rgba(139,92,246,0.08)', padding: '.75rem', borderRadius: 10, borderLeft: '3px solid rgba(139,92,246,0.4)', textAlign: 'left', width: '100%' }}>
+                            <p style={{ fontSize: '.8rem', fontStyle: 'italic', color: '#9990c4', marginBottom: '.2rem' }}>"{vocab.example}"</p>
+                            {vocab.example_translation && <p style={{ fontSize: '.72rem', color: '#6b6494' }}>— {vocab.example_translation}</p>}
                         </div>
                     )}
-                    <p style={{ marginTop: '.75rem', fontSize: '.8rem', color: '#94a3b8', fontFamily: 'var(--font-playful)' }}>Tap to flip back</p>
+                    <p style={{ marginTop: '.75rem', fontSize: '.8rem', color: '#5c587a', fontFamily: 'var(--font-playful)' }}>Tap to flip back</p>
                 </div>
             </div>
         </div>
@@ -714,16 +717,15 @@ function VocabTest({ vocabulary, lang }) {
     if (done) {
         const pct = Math.round((correct / vocabulary.length) * 100);
         return (
-            <div style={{ textAlign: 'center', padding: '2.5rem', background: 'white', borderRadius: 18, boxShadow: '0 4px 20px rgba(0,0,0,.06)', animation: 'popIn .4s ease-out' }}>
-                <p style={{ fontSize: '3rem', marginBottom: '.75rem' }}>{pct >= 80 ? '🌟' : pct >= 50 ? '🎉' : '💪'}</p>
-                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: '#1e1b4b', marginBottom: '.4rem' }}>
+            <div style={{ textAlign: 'center', padding: '2.5rem', background: '#1a1630', borderRadius: 18, boxShadow: '0 4px 20px rgba(0,0,0,.3)', animation: 'popIn .4s ease-out', border: '1.5px solid rgba(255,255,255,0.07)' }}>
+                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: '#ede9ff', marginBottom: '.4rem' }}>
                     {pct >= 80 ? 'Incredible!' : pct >= 50 ? 'Great effort!' : 'Keep practicing!'}
                 </h3>
-                <p style={{ fontFamily: 'var(--font-playful)', fontSize: '1.1rem', color: '#64748b', marginBottom: '1.25rem' }}>
+                <p style={{ fontFamily: 'var(--font-playful)', fontSize: '1.1rem', color: '#7b749e', marginBottom: '1.25rem' }}>
                     {correct} / {vocabulary.length} correct ({pct}%)
                 </p>
                 <button onClick={() => { setIdx(0); setInput(''); setResult(null); setCorrect(0); setDone(false); }} style={{
-                    padding: '.7rem 1.75rem', background: '#7c3aed', color: 'white', border: 'none',
+                    padding: '.7rem 1.75rem', background: '#8b5cf6', color: 'white', border: 'none',
                     borderRadius: 12, fontFamily: 'var(--font-playful)', fontWeight: 700, fontSize: '.95rem', cursor: 'pointer',
                 }}>Try Again</button>
             </div>
@@ -731,15 +733,15 @@ function VocabTest({ vocabulary, lang }) {
     }
 
     return (
-        <div style={{ padding: '2rem', background: 'white', borderRadius: 18, boxShadow: '0 4px 20px rgba(0,0,0,.06)', textAlign: 'center' }}>
+        <div style={{ padding: '2rem', background: '#1a1630', borderRadius: 18, boxShadow: '0 4px 20px rgba(0,0,0,.3)', textAlign: 'center', border: '1.5px solid rgba(255,255,255,0.07)' }}>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '.2rem', marginBottom: '1.5rem' }}>
                 {vocabulary.map((_, i) => (
                     <div key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: i < idx ? '#06d6a0' : i === idx ? '#7c3aed' : '#e2e8f0', transition: 'all .3s' }} />
                 ))}
             </div>
-            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', color: '#7c3aed', marginBottom: '.35rem' }}>{cur.word}</h3>
-            <p style={{ fontFamily: 'monospace', fontSize: '.78rem', color: '#94a3b8', marginBottom: '.2rem' }}>{cur.pronunciation}</p>
-            <button onClick={() => speak(cur.word, lang)} style={{ background: 'none', border: 'none', color: '#0ea5e9', cursor: 'pointer', marginBottom: '1.25rem' }}>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', color: '#a78bfa', marginBottom: '.35rem' }}>{cur.word}</h3>
+            <p style={{ fontFamily: 'monospace', fontSize: '.78rem', color: '#6b6494', marginBottom: '.2rem' }}>{cur.pronunciation}</p>
+            <button onClick={() => speak(cur.word, lang)} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', marginBottom: '1.25rem' }}>
                 <Volume2 size={20} />
             </button>
             <div style={{ maxWidth: 340, margin: '0 auto' }}>
@@ -749,10 +751,10 @@ function VocabTest({ vocabulary, lang }) {
                     disabled={!!result}
                     style={{
                         width: '100%', padding: '.7rem 1rem', fontSize: '1rem', borderRadius: 12,
-                        border: `2px solid ${result === 'correct' ? '#16a34a' : result === 'wrong' ? '#dc2626' : '#e2e8f0'}`,
+                        border: `2px solid ${result === 'correct' ? 'rgba(52,211,153,0.4)' : result === 'wrong' ? 'rgba(248,113,113,0.4)' : 'rgba(255,255,255,0.1)'}`,
                         fontFamily: 'var(--font-playful)', textAlign: 'center', marginBottom: '.9rem',
-                        background: result === 'correct' ? '#f0fdf4' : result === 'wrong' ? '#fef2f2' : 'white',
-                        outline: 'none',
+                        background: result === 'correct' ? 'rgba(52,211,153,0.1)' : result === 'wrong' ? 'rgba(248,113,113,0.1)' : 'rgba(255,255,255,0.05)',
+                        color: '#ede9ff', outline: 'none',
                     }}
                 />
                 {!result ? (
@@ -806,13 +808,13 @@ function SessionWordBank({ words }) {
     const [open, setOpen] = useState(false);
     if (!words.length) return null;
     return (
-        <div style={{ marginTop: '2rem', padding: '1.25rem', background: 'rgba(124,58,237,.05)', borderRadius: 16, border: '1.5px solid rgba(124,58,237,.12)' }}>
+        <div style={{ marginTop: '2rem', padding: '1.25rem', background: 'rgba(139,92,246,0.06)', borderRadius: 16, border: '1.5px solid rgba(139,92,246,.15)' }}>
             <button onClick={() => setOpen(o => !o)} style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 width: '100%', background: 'none', border: 'none', cursor: 'pointer',
-                fontFamily: 'var(--font-playful)', fontWeight: 700, fontSize: '.95rem', color: '#7c3aed',
+                fontFamily: 'var(--font-playful)', fontWeight: 700, fontSize: '.95rem', color: '#a78bfa',
             }}>
-                <span>📖 Your Session Word Bank ({words.length} words discovered)</span>
+                <span>Word Bank ({words.length} words)</span>
                 <span style={{ transform: open ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform .25s', fontSize: '.8rem' }}>›</span>
             </button>
             {open && (
@@ -909,7 +911,7 @@ function StoryContent() {
                             setStory(s => ({ ...(s || {}), ...meta, content: contentAcc }));
                             if (!usageCounted && !isLoggedIn) { incrementDailyUsage(); usageCounted = true; }
                         } else if (evt.type === 'image') {
-                            setStory(s => ({ ...s, imageUrl: evt.url }));
+                            setStory(s => ({ ...s, imageUrl: evt.b64 ? 'data:image/png;base64,' + evt.b64 : evt.url }));
                         } else if (evt.type === 'done') {
                             setLoading(false);
                         } else if (evt.type === 'error') {
@@ -1028,36 +1030,35 @@ function StoryContent() {
         <div style={{
             minHeight: '100vh', display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-            padding: '3rem', background: 'linear-gradient(160deg,#fdf6e3 0%,#f3e8ff 50%,#e0f2fe 100%)',
+            padding: '3rem', background: 'linear-gradient(160deg,#0e0b1e 0%,#130d2a 50%,#0b1220 100%)',
         }}>
-            <div style={{ fontSize: '4.5rem', marginBottom: '1.25rem', animation: 'bounce 1.2s ease-in-out infinite' }}>📖</div>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem,4vw,2.2rem)', color: '#7c3aed', marginBottom: '.6rem' }}>
+            <div style={{ fontSize: '4rem', marginBottom: '1.25rem', animation: 'bounce 1.2s ease-in-out infinite' }}>📖</div>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem,4vw,2.2rem)', color: '#a78bfa', marginBottom: '.6rem' }}>
                 Weaving your story...
             </h2>
-            <p style={{ color: '#64748b', fontSize: '1rem', fontFamily: 'var(--font-playful)', marginBottom: '1.5rem' }}>
-                ✨ {level} {lang} story about {topic.toLowerCase()}
+            <p style={{ color: '#7b749e', fontSize: '1rem', fontFamily: 'var(--font-playful)', marginBottom: '1.5rem' }}>
+                {level} {lang} story about {topic.toLowerCase()}
             </p>
-            <div style={{ display: 'flex', gap: '.4rem', marginBottom: '1.75rem' }}>
+            <div style={{ display: 'flex', gap: '.4rem', marginBottom: '1.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
                 {['Generating story', 'Creating illustration', 'Building exercises'].map((s, i) => (
                     <span key={i} style={{
-                        padding: '.28rem .7rem', background: 'rgba(124,58,237,.08)',
+                        padding: '.28rem .7rem', background: 'rgba(139,92,246,.1)',
                         borderRadius: 50, fontSize: '.72rem', fontFamily: 'var(--font-playful)',
-                        fontWeight: 600, color: '#7c3aed', animation: `pulse 1.5s ease-in-out infinite ${i * .4}s`,
+                        fontWeight: 600, color: '#a78bfa', animation: `pulse 1.5s ease-in-out infinite ${i * .4}s`,
                     }}>{s}</span>
                 ))}
             </div>
-            <Loader2 style={{ animation: 'spin 1s linear infinite', color: '#7c3aed' }} size={30} />
+            <Loader2 style={{ animation: 'spin 1s linear infinite', color: '#8b5cf6' }} size={30} />
         </div>
     );
 
     // ── Error ──
     if (!story) return (
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fffdf7' }}>
-            <div style={{ textAlign: 'center', padding: '2.5rem', background: 'white', borderRadius: 20, boxShadow: '0 4px 20px rgba(0,0,0,.08)', maxWidth: 380 }}>
-                <p style={{ fontSize: '2.5rem', marginBottom: '.5rem' }}>😕</p>
-                <p style={{ color: '#e11d48', fontSize: '1.1rem', marginBottom: '.75rem', fontFamily: 'var(--font-playful)', fontWeight: 700 }}>Something went wrong</p>
-                <p style={{ color: '#64748b', fontSize: '.88rem', marginBottom: '1.25rem', fontFamily: 'var(--font-playful)' }}>Check that your OPENAI_API_KEY is set.</p>
-                <Link href="/" style={{ color: '#7c3aed', fontFamily: 'var(--font-playful)', fontWeight: 600, fontSize: '.95rem' }}>← Try again</Link>
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0e0b1e' }}>
+            <div style={{ textAlign: 'center', padding: '2.5rem', background: '#1a1630', borderRadius: 20, boxShadow: '0 4px 20px rgba(0,0,0,.3)', maxWidth: 380, border: '1.5px solid rgba(255,255,255,0.07)' }}>
+                <p style={{ color: '#f87171', fontSize: '1.1rem', marginBottom: '.75rem', fontFamily: 'var(--font-playful)', fontWeight: 700 }}>Something went wrong</p>
+                <p style={{ color: '#7b749e', fontSize: '.88rem', marginBottom: '1.25rem', fontFamily: 'var(--font-playful)' }}>Check that your OPENAI_API_KEY is set.</p>
+                <Link href="/" style={{ color: '#a78bfa', fontFamily: 'var(--font-playful)', fontWeight: 600, fontSize: '.95rem' }}>← Try again</Link>
             </div>
         </div>
     );
@@ -1070,7 +1071,7 @@ function StoryContent() {
     return (
         <div style={{
             position: 'relative', minHeight: '100vh',
-            background: 'linear-gradient(160deg,#fdf6e3 0%,#f3e8ff 45%,#e0f2fe 80%,#fdf6e3 100%)',
+            background: 'linear-gradient(160deg,#0e0b1e 0%,#130d2a 50%,#0b1220 100%)',
             padding: '2.5rem 1.25rem 8rem',
         }}>
             <Confetti active={showConfetti} />
@@ -1088,9 +1089,9 @@ function StoryContent() {
             <div style={{ maxWidth: 900, margin: '0 auto' }}>
                 {/* Back nav */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '.75rem' }}>
-                    <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '.35rem', color: '#64748b', textDecoration: 'none', fontFamily: 'var(--font-playful)', fontSize: '.88rem', transition: 'color .2s' }}
-                        onMouseOver={e => e.currentTarget.style.color = '#7c3aed'}
-                        onMouseOut={e => e.currentTarget.style.color = '#64748b'}>
+                    <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '.35rem', color: '#7b749e', textDecoration: 'none', fontFamily: 'var(--font-playful)', fontSize: '.88rem', transition: 'color .2s' }}
+                        onMouseOver={e => e.currentTarget.style.color = '#a78bfa'}
+                        onMouseOut={e => e.currentTarget.style.color = '#7b749e'}>
                         <ArrowLeft size={15} /> Back to Stories
                     </Link>
                     <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -1106,18 +1107,18 @@ function StoryContent() {
                         {user ? (
                             <button onClick={() => supabase?.auth.signOut()} title="Sign out" style={{
                                 display: 'inline-flex', alignItems: 'center', gap: '.3rem',
-                                padding: '.25rem .7rem', background: '#f0fdf4', borderRadius: 50,
-                                border: '1.5px solid #bbf7d0', fontSize: '.72rem',
-                                fontFamily: 'var(--font-playful)', fontWeight: 700, color: '#15803d',
+                                padding: '.25rem .7rem', background: 'rgba(52,211,153,0.1)', borderRadius: 50,
+                                border: '1.5px solid rgba(52,211,153,0.3)', fontSize: '.72rem',
+                                fontFamily: 'var(--font-playful)', fontWeight: 700, color: '#34d399',
                                 cursor: 'pointer',
                             }}>
-                                ✓ {user.email?.split('@')[0]}
+                                {user.email?.split('@')[0]}
                             </button>
                         ) : (
                             <span style={{
-                                padding: '.25rem .7rem', background: '#fef9c3', borderRadius: 50,
+                                padding: '.25rem .7rem', background: 'rgba(245,158,11,0.1)', borderRadius: 50,
                                 fontSize: '.72rem', fontFamily: 'var(--font-playful)', fontWeight: 600,
-                                color: '#92400e', border: '1.5px solid #fde68a',
+                                color: '#d97706', border: '1.5px solid rgba(245,158,11,0.25)',
                             }}>
                                 {FREE_LIMIT - getDailyUsage().count} stories left today
                             </span>
@@ -1127,12 +1128,12 @@ function StoryContent() {
 
                 {/* ── Story Card ── */}
                 <div style={{
-                    background: '#fffef7',
+                    background: '#16132b',
                     borderRadius: 20,
                     padding: 'clamp(1.75rem,6vw,3.5rem)',
-                    boxShadow: '0 4px 6px rgba(0,0,0,.04), 0 20px 60px rgba(124,58,237,.1)',
-                    border: '1.5px solid rgba(245,158,11,.15)',
-                    borderTop: '4px solid #f59e0b',
+                    boxShadow: '0 4px 6px rgba(0,0,0,.3), 0 20px 60px rgba(139,92,246,.12)',
+                    border: '1.5px solid rgba(255,255,255,0.07)',
+                    borderTop: '3px solid #8b5cf6',
                     marginBottom: '3rem',
                 }}>
                     {/* Banner illustration */}
@@ -1160,11 +1161,11 @@ function StoryContent() {
                         ) : (
                             <div style={{
                                 width: '100%', height: '100%',
-                                background: 'linear-gradient(110deg,#f3e8ff 30%,#e0f2fe 50%,#f3e8ff 70%)',
+                                background: 'linear-gradient(110deg,#1a1630 30%,#221c40 50%,#1a1630 70%)',
                                 backgroundSize: '200% 100%', animation: 'shimmer 1.6s linear infinite',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                             }}>
-                                <p style={{ fontFamily: 'var(--font-playful)', color: '#a78bfa', fontSize: '.88rem' }}>✨ Painting your illustration…</p>
+                                <p style={{ fontFamily: 'var(--font-playful)', color: '#6b6494', fontSize: '.88rem' }}>Painting your illustration…</p>
                             </div>
                         )}
                     </div>
@@ -1172,7 +1173,7 @@ function StoryContent() {
                     {/* Title */}
                     <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                         <h1 style={{
-                            fontSize: 'clamp(1.8rem,6vw,3rem)', color: '#1e1b4b',
+                            fontSize: 'clamp(1.8rem,6vw,3rem)', color: '#ede9ff',
                             fontFamily: 'var(--font-display)', lineHeight: 1.15,
                             marginBottom: '.4rem', cursor: 'help',
                         }} title="Double-click for translation"
@@ -1188,8 +1189,8 @@ function StoryContent() {
 
                     {/* Controls */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '.5rem' }}>
-                        <p style={{ fontSize: '.78rem', color: '#94a3b8', fontFamily: 'var(--font-playful)', display: 'flex', alignItems: 'center', gap: '.3rem' }}>
-                            <span>💡</span> Double-click any word for instant definition
+                        <p style={{ fontSize: '.78rem', color: '#6b6494', fontFamily: 'var(--font-playful)', display: 'flex', alignItems: 'center', gap: '.3rem' }}>
+                            Double-click any word for instant definition
                         </p>
                         <div style={{ display: 'flex', gap: '.5rem' }}>
                             <button onClick={() => setShowTrans(t => !t)} style={{
@@ -1221,14 +1222,14 @@ function StoryContent() {
                     {/* Story text */}
                     <div style={{
                         fontFamily: 'Georgia, var(--font-body)', fontSize: 'clamp(1.1rem,2.5vw,1.3rem)',
-                        lineHeight: 2, color: '#2d3748', cursor: 'text', userSelect: 'text',
+                        lineHeight: 2, color: '#c8c2ee', cursor: 'text', userSelect: 'text',
                     }} onDoubleClick={handleWordDoubleClick} data-story-text="true">
                         <InteractiveText content={story.content} vocabulary={story.vocabulary || []} />
                     </div>
 
                     {/* Translation */}
                     {showTrans && story.content_translation && (
-                        <div style={{ marginTop: '1.75rem', padding: '1.5rem', background: '#f0f7ff', borderRadius: 14, borderLeft: '4px solid #7c3aed', fontFamily: 'Georgia, serif', fontSize: '1.05rem', color: '#475569', lineHeight: 1.75, fontStyle: 'italic', animation: 'fadeInUp .3s ease-out' }}>
+                        <div style={{ marginTop: '1.75rem', padding: '1.5rem', background: 'rgba(139,92,246,0.08)', borderRadius: 14, borderLeft: '3px solid #8b5cf6', fontFamily: 'Georgia, serif', fontSize: '1.05rem', color: '#9990c4', lineHeight: 1.75, fontStyle: 'italic', animation: 'fadeInUp .3s ease-out' }}>
                             {story.content_translation}
                         </div>
                     )}
@@ -1240,10 +1241,10 @@ function StoryContent() {
                     {story.exercises?.length > 0 && (
                         <div style={{ marginTop: '3.5rem', borderTop: '2px solid rgba(124,58,237,.08)', paddingTop: '2.75rem' }}>
                             <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
-                                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem,4vw,2rem)', color: '#1e1b4b', marginBottom: '.4rem' }}>
-                                    🎮 Practice Time!
+                                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem,4vw,2rem)', color: '#ede9ff', marginBottom: '.4rem' }}>
+                                    Practice
                                 </h3>
-                                <p style={{ fontFamily: 'var(--font-playful)', color: '#64748b', fontSize: '.9rem' }}>
+                                <p style={{ fontFamily: 'var(--font-playful)', color: '#7b749e', fontSize: '.9rem' }}>
                                     Answer correctly to earn points · {totalExercises} exercises
                                 </p>
                             </div>
@@ -1252,13 +1253,13 @@ function StoryContent() {
                             <div style={{
                                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                                 marginBottom: '1.25rem', padding: '1rem 1.4rem',
-                                background: 'linear-gradient(135deg,#fffbeb,#fef3c7)',
-                                borderRadius: 16, border: '2px solid rgba(245,158,11,.2)',
+                                background: 'rgba(245,158,11,0.07)',
+                                borderRadius: 16, border: '1.5px solid rgba(245,158,11,.15)',
                                 flexWrap: 'wrap', gap: '.5rem',
                             }}>
-                                <div className="score-badge">⭐ {score} pts</div>
-                                {streak >= 2 && <div className="streak-badge" style={{ animation: 'fireFlicker 1s ease-in-out infinite' }}>🔥 {streak} streak!</div>}
-                                <div style={{ fontFamily: 'var(--font-playful)', color: '#64748b', fontSize: '.88rem' }}>
+                                <div className="score-badge">{score} pts</div>
+                                {streak >= 2 && <div className="streak-badge" style={{ animation: 'fireFlicker 1s ease-in-out infinite' }}>{streak} streak</div>}
+                                <div style={{ fontFamily: 'var(--font-playful)', color: '#7b749e', fontSize: '.88rem' }}>
                                     {answeredCount} / {totalExercises} answered
                                 </div>
                             </div>
@@ -1274,19 +1275,16 @@ function StoryContent() {
                             {answeredCount === totalExercises && totalExercises > 0 && (
                                 <div style={{
                                     marginTop: '2rem', padding: '2rem', textAlign: 'center',
-                                    background: 'linear-gradient(135deg,#f0fdf4,#ecfdf5)',
-                                    borderRadius: 18, border: '2px solid #86efac',
+                                    background: 'rgba(52,211,153,0.07)',
+                                    borderRadius: 18, border: '1.5px solid rgba(52,211,153,0.25)',
                                     animation: 'popIn .4s ease-out',
                                 }}>
-                                    <p style={{ fontSize: '2.5rem', marginBottom: '.5rem' }}>
-                                        {scorePct >= 80 ? '🌟' : scorePct >= 60 ? '🎉' : scorePct >= 40 ? '👍' : '💪'}
-                                    </p>
-                                    <h4 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: '#1e1b4b', marginBottom: '.4rem' }}>
-                                        {scorePct >= 80 ? 'Outstanding! You\'re a star!' : scorePct >= 60 ? 'Excellent work!' : scorePct >= 40 ? 'Good effort!' : 'Keep practicing!'}
+                                    <h4 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: '#ede9ff', marginBottom: '.4rem' }}>
+                                        {scorePct >= 80 ? 'Outstanding!' : scorePct >= 60 ? 'Excellent work!' : scorePct >= 40 ? 'Good effort!' : 'Keep practicing!'}
                                     </h4>
-                                    <p style={{ fontFamily: 'var(--font-playful)', color: '#64748b' }}>
-                                        Score: <strong>{score} pts</strong> · {correctCount}/{totalExercises} correct ({scorePct}%)
-                                        {maxStreak >= 3 && <span> · 🔥 Best streak: {maxStreak}</span>}
+                                    <p style={{ fontFamily: 'var(--font-playful)', color: '#7b749e' }}>
+                                        {score} pts · {correctCount}/{totalExercises} correct ({scorePct}%)
+                                        {maxStreak >= 3 && <span> · Best streak: {maxStreak}</span>}
                                     </p>
                                 </div>
                             )}
@@ -1299,7 +1297,7 @@ function StoryContent() {
                     <div style={{ marginBottom: '5rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.75rem' }}>
                             <div style={{ flex: 1, height: 2, background: 'linear-gradient(to right,transparent,rgba(124,58,237,.3),transparent)' }} />
-                            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', color: '#1e1b4b', whiteSpace: 'nowrap' }}>📖 Word Collection</h2>
+                            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', color: '#ede9ff', whiteSpace: 'nowrap' }}>Word Collection</h2>
                             <div style={{ flex: 1, height: 2, background: 'linear-gradient(to right,transparent,rgba(124,58,237,.3),transparent)' }} />
                         </div>
 
@@ -1321,8 +1319,8 @@ function StoryContent() {
 
                         {!testMode && (
                             <>
-                                <div style={{ background: 'rgba(124,58,237,.05)', padding: '.75rem', borderRadius: 12, marginBottom: '1.5rem', border: '1px solid rgba(124,58,237,.1)', textAlign: 'center' }}>
-                                    <p style={{ fontSize: '.82rem', color: '#64748b', fontFamily: 'var(--font-playful)' }}>
+                                <div style={{ background: 'rgba(139,92,246,0.06)', padding: '.75rem', borderRadius: 12, marginBottom: '1.5rem', border: '1px solid rgba(139,92,246,.12)', textAlign: 'center' }}>
+                                    <p style={{ fontSize: '.82rem', color: '#7b749e', fontFamily: 'var(--font-playful)' }}>
                                         Tap each card to reveal meaning · {(story.vocabulary || []).length} words learned this story
                                     </p>
                                 </div>

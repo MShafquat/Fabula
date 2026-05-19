@@ -114,15 +114,14 @@ export async function POST(req) {
                     try {
                         const styleFn = artStyle[level] || artStyle.Intermediate;
                         const imgRes = await openai.images.generate({
-                            model: 'dall-e-3',
+                            model: 'gpt-image-1',
                             prompt: styleFn(scene),
                             n: 1,
-                            size: '1792x1024',
-                            quality: 'standard',
-                            style: 'natural',
+                            size: '1024x1024',
+                            quality: 'low',
                         });
-                        const url = imgRes.data[0]?.url;
-                        if (url) send({ type: 'image', url });
+                        const b64 = imgRes.data[0]?.b64_json;
+                        if (b64) send({ type: 'image', b64 });
                     } catch (imgErr) {
                         console.error('Image generation error:', imgErr.message);
                     }

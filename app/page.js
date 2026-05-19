@@ -212,7 +212,7 @@ function GreetingRotator() {
             <span style={{
                 fontSize: 'clamp(1.6rem, 5vw, 2.4rem)',
                 fontFamily: 'var(--font-display)',
-                color: '#7c3aed',
+                color: '#a78bfa',
                 transition: 'opacity .3s ease, transform .3s ease',
                 opacity: fade ? 1 : 0,
                 transform: fade ? 'translateY(0)' : 'translateY(-8px)',
@@ -222,7 +222,7 @@ function GreetingRotator() {
             </span>
             <span style={{
                 fontSize: '.8rem', fontFamily: 'var(--font-playful)', fontWeight: 600,
-                color: '#94a3b8', background: '#f1f5f9', padding: '.2rem .6rem',
+                color: '#6b6494', background: 'rgba(255,255,255,0.07)', padding: '.2rem .6rem',
                 borderRadius: '50px', transition: 'opacity .3s ease', opacity: fade ? 1 : 0,
             }}>
                 {lang}
@@ -278,7 +278,7 @@ export default function Home() {
     return (
         <main style={{
             minHeight: '100vh',
-            background: 'linear-gradient(160deg, #fdf6e3 0%, #f3e8ff 45%, #e0f2fe 80%, #fdf6e3 100%)',
+            background: 'linear-gradient(160deg, #0e0b1e 0%, #130d2a 50%, #0b1220 100%)',
             position: 'relative',
             overflow: 'hidden',
             paddingBottom: '4rem',
@@ -297,18 +297,6 @@ export default function Home() {
                 </div>
             ))}
 
-            {/* Subtle star sparkles */}
-            {[
-                { t: '15%', l: '18%', d: 0 }, { t: '25%', r: '20%', d: 1 },
-                { t: '60%', l: '12%', d: 2 }, { t: '75%', r: '15%', d: .5 },
-            ].map((s, i) => (
-                <div key={i} style={{
-                    position: 'absolute', top: s.t, left: s.l, right: s.r,
-                    fontSize: '1.1rem', opacity: .14, pointerEvents: 'none',
-                    animation: `twinkle ${4 + i}s ease-in-out infinite`,
-                    animationDelay: `${s.d}s`,
-                }}>✦</div>
-            ))}
 
             <div style={{ maxWidth: '780px', margin: '0 auto', padding: '2.5rem 1.25rem 2rem', position: 'relative', zIndex: 10 }}>
 
@@ -317,9 +305,9 @@ export default function Home() {
                     <div style={{
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                         width: 72, height: 72,
-                        background: 'white',
+                        background: 'rgba(139,92,246,0.12)',
                         borderRadius: '50%',
-                        boxShadow: '0 8px 24px rgba(124,58,237,.18)',
+                        boxShadow: '0 8px 24px rgba(139,92,246,.3)',
                         marginBottom: '1rem',
                         fontSize: '2.2rem',
                         animation: 'bounce 3s ease-in-out infinite',
@@ -340,7 +328,7 @@ export default function Home() {
 
                     <p style={{
                         fontSize: 'clamp(.95rem, 2.5vw, 1.15rem)',
-                        color: '#4c4675',
+                        color: '#9990c4',
                         fontFamily: 'var(--font-playful)',
                         maxWidth: 420,
                         margin: '0 auto 1.5rem',
@@ -352,23 +340,22 @@ export default function Home() {
                     {/* Trust badges */}
                     <div style={{ display: 'flex', justifyContent: 'center', gap: '.5rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
                         {[
-                            { icon: '🌍', text: '38 Languages' },
-                            { icon: '📖', text: '8 Story Types' },
-                            { icon: '⚡', text: 'No Account Needed' },
+                            { text: '38 Languages' },
+                            { text: '8 Story Types' },
+                            { text: 'No Account Needed' },
                         ].map(b => (
                             <span key={b.text} style={{
                                 display: 'inline-flex', alignItems: 'center', gap: '.3rem',
                                 padding: '.32rem .75rem',
-                                background: 'white',
+                                background: 'rgba(255,255,255,0.05)',
                                 borderRadius: '50px',
                                 fontSize: '.78rem',
                                 fontFamily: 'var(--font-playful)',
                                 fontWeight: 600,
-                                color: '#4c4675',
-                                boxShadow: '0 2px 8px rgba(124,58,237,.1)',
-                                border: '1px solid rgba(124,58,237,.1)',
+                                color: '#9990c4',
+                                border: '1px solid rgba(255,255,255,0.1)',
                             }}>
-                                {b.icon} {b.text}
+                                {b.text}
                             </span>
                         ))}
                     </div>
@@ -380,27 +367,27 @@ export default function Home() {
                             display: 'inline-flex', alignItems: 'center', gap: '.5rem',
                             padding: '.55rem 1.25rem',
                             background: 'transparent',
-                            border: '2px solid #7c3aed',
+                            border: '2px solid rgba(139,92,246,0.5)',
                             borderRadius: '50px',
-                            color: '#7c3aed',
+                            color: '#a78bfa',
                             fontFamily: 'var(--font-playful)',
                             fontWeight: 600, fontSize: '.85rem',
                             cursor: 'pointer',
                             transition: 'all .2s ease',
                         }}
-                        onMouseOver={e => { e.currentTarget.style.background = '#7c3aed'; e.currentTarget.style.color = 'white'; }}
-                        onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#7c3aed'; }}
+                        onMouseOver={e => { e.currentTarget.style.background = '#8b5cf6'; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = '#8b5cf6'; }}
+                        onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#a78bfa'; e.currentTarget.style.borderColor = 'rgba(139,92,246,0.5)'; }}
                     >
-                        <Zap size={14} /> Try an instant story → Spanish Beginner
+                        <Zap size={14} /> Try a quick story — Spanish Beginner
                     </button>
                 </div>
 
                 {/* ── FREE COUNTER ──────────────────────────────────────── */}
                 <div className="freemium-banner">
                     <span className="free-text">
-                        🎁 {storiesLeft > 0
+                        {storiesLeft > 0
                             ? `${storiesLeft} free ${storiesLeft === 1 ? 'story' : 'stories'} remaining today — resets at midnight`
-                            : 'Daily limit reached — create a free account for unlimited stories!'}
+                            : 'Daily limit reached — create a free account for unlimited stories'}
                     </span>
                 </div>
 
@@ -425,11 +412,11 @@ export default function Home() {
 
                 {/* ── WIZARD CARD ───────────────────────────────────────── */}
                 <div style={{
-                    background: 'rgba(255,255,255,0.92)',
+                    background: 'rgba(22,19,43,0.95)',
                     backdropFilter: 'blur(12px)',
                     borderRadius: 24,
-                    boxShadow: '0 4px 6px rgba(0,0,0,0.04), 0 20px 60px rgba(124,58,237,0.1)',
-                    border: '1.5px solid rgba(124,58,237,0.08)',
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.3), 0 20px 60px rgba(139,92,246,0.15)',
+                    border: '1.5px solid rgba(255,255,255,0.07)',
                     padding: 'clamp(1.5rem,5vw,2.75rem)',
                     minHeight: 360,
                     animation: 'pageIn .45s ease-out',
@@ -440,7 +427,7 @@ export default function Home() {
                         <div style={{ animation: 'fadeInUp .35s ease-out' }}>
                             <h2 style={{
                                 textAlign: 'center', fontFamily: 'var(--font-display)',
-                                fontSize: 'clamp(1.4rem,4vw,1.8rem)', color: '#1e1b4b',
+                                fontSize: 'clamp(1.4rem,4vw,1.8rem)', color: '#ede9ff',
                                 marginBottom: '1.75rem',
                             }}>What's your level?</h2>
 
@@ -453,35 +440,35 @@ export default function Home() {
                                             flex: '1 1 180px', maxWidth: 220,
                                             padding: '1.5rem 1rem',
                                             borderRadius: 20,
-                                            border: `2.5px solid ${selectedLevel === lvl.id ? lvl.color : '#e2e8f0'}`,
-                                            background: selectedLevel === lvl.id ? lvl.bg : 'white',
+                                            border: `2px solid ${selectedLevel === lvl.id ? lvl.color : 'rgba(255,255,255,0.08)'}`,
+                                            background: selectedLevel === lvl.id ? lvl.bg : 'rgba(255,255,255,0.04)',
                                             cursor: 'pointer',
                                             transition: 'all .25s cubic-bezier(.34,1.56,.64,1)',
                                             textAlign: 'center',
                                             boxShadow: selectedLevel === lvl.id
-                                                ? `0 0 0 3px ${lvl.color}22, 0 8px 24px rgba(0,0,0,0.1)`
-                                                : '0 2px 8px rgba(0,0,0,0.05)',
+                                                ? `0 0 0 3px ${lvl.color}22, 0 8px 24px rgba(0,0,0,0.3)`
+                                                : '0 2px 8px rgba(0,0,0,0.2)',
                                             transform: selectedLevel === lvl.id ? 'translateY(-4px)' : 'translateY(0)',
                                         }}
                                         onMouseOver={e => { if (selectedLevel !== lvl.id) e.currentTarget.style.transform = 'translateY(-6px)'; }}
                                         onMouseOut={e => { if (selectedLevel !== lvl.id) e.currentTarget.style.transform = 'translateY(0)'; }}
                                     >
-                                        <span style={{ fontSize: '2.6rem', display: 'block', marginBottom: '.5rem' }}>{lvl.emoji}</span>
+                                        <span style={{ fontSize: '2.4rem', display: 'block', marginBottom: '.5rem' }}>{lvl.emoji}</span>
                                         <span style={{ fontFamily: 'var(--font-playful)', fontSize: '1.1rem', fontWeight: 700, color: lvl.color, display: 'block', marginBottom: '.25rem' }}>{lvl.label}</span>
-                                        <span style={{ fontFamily: 'var(--font-ui)', fontSize: '.75rem', color: '#94a3b8', display: 'block' }}>{lvl.sublabel}</span>
+                                        <span style={{ fontFamily: 'var(--font-ui)', fontSize: '.75rem', color: '#7b749e', display: 'block' }}>{lvl.sublabel}</span>
                                         <span style={{
                                             marginTop: '.6rem', display: 'block',
-                                            fontSize: '.72rem', color: '#64748b',
+                                            fontSize: '.72rem', color: '#6b6494',
                                             fontFamily: 'var(--font-ui)', lineHeight: 1.4,
-                                            background: '#f8fafc', padding: '.3rem .5rem',
+                                            background: 'rgba(255,255,255,0.05)', padding: '.3rem .5rem',
                                             borderRadius: 8,
                                         }}>{lvl.desc}</span>
                                     </button>
                                 ))}
                             </div>
 
-                            <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '.8rem', color: '#94a3b8', fontFamily: 'var(--font-playful)' }}>
-                                💡 Not sure? Start with Beginner — you can always try harder levels
+                            <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '.8rem', color: '#6b6494', fontFamily: 'var(--font-playful)' }}>
+                                Not sure? Start with Beginner — you can always try harder levels
                             </p>
                         </div>
                     )}
@@ -491,7 +478,7 @@ export default function Home() {
                         <div style={{ animation: 'fadeInUp .35s ease-out' }}>
                             <h2 style={{
                                 textAlign: 'center', fontFamily: 'var(--font-display)',
-                                fontSize: 'clamp(1.4rem,4vw,1.8rem)', color: '#1e1b4b',
+                                fontSize: 'clamp(1.4rem,4vw,1.8rem)', color: '#ede9ff',
                                 marginBottom: '1.25rem',
                             }}>Which language?</h2>
 
@@ -551,7 +538,7 @@ export default function Home() {
                         <div style={{ animation: 'fadeInUp .35s ease-out' }}>
                             <h2 style={{
                                 textAlign: 'center', fontFamily: 'var(--font-display)',
-                                fontSize: 'clamp(1.4rem,4vw,1.8rem)', color: '#1e1b4b',
+                                fontSize: 'clamp(1.4rem,4vw,1.8rem)', color: '#ede9ff',
                                 marginBottom: '1.75rem',
                             }}>What's your story about?</h2>
 
@@ -604,13 +591,13 @@ export default function Home() {
                             style={{
                                 display: 'flex', alignItems: 'center', gap: '.4rem',
                                 padding: '.65rem 1.1rem', borderRadius: 12,
-                                border: '2px solid #e2e8f0', background: 'white',
+                                border: '2px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)',
                                 fontFamily: 'var(--font-playful)', fontWeight: 600,
-                                fontSize: '.9rem', color: '#64748b', cursor: 'pointer',
+                                fontSize: '.9rem', color: '#9990c4', cursor: 'pointer',
                                 transition: 'all .2s',
                             }}
-                            onMouseOver={e => e.currentTarget.style.borderColor = '#7c3aed'}
-                            onMouseOut={e => e.currentTarget.style.borderColor = '#e2e8f0'}
+                            onMouseOver={e => e.currentTarget.style.borderColor = '#8b5cf6'}
+                            onMouseOut={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
                         >
                             <ChevronLeft size={16} /> Back
                         </button>
@@ -660,9 +647,7 @@ export default function Home() {
                                 onMouseOver={e => { if (selectedLevel && selectedLang && selectedTopic) e.currentTarget.style.transform = 'translateY(-2px)'; }}
                                 onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}
                             >
-                                {!canGenerate ? '🔒 Daily limit reached' : '📖 Open the Book!'}
-                                {/* Shine sweep on hover */}
-                                <style>{`.open-book-btn::after { content:''; position:absolute; top:0; left:-100%; width:60%; height:100%; background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.25) 50%,transparent 70%); animation: shine 2s ease infinite; }`}</style>
+                                {!canGenerate ? 'Daily limit reached' : 'Open the Book'}
                             </button>
                         </div>
                     )}
@@ -670,33 +655,31 @@ export default function Home() {
 
                 {/* ── HOW IT WORKS ──────────────────────────────────────── */}
                 <div style={{ marginTop: '3.5rem' }}>
-                    <p style={{ textAlign: 'center', fontFamily: 'var(--font-playful)', fontWeight: 700, color: '#94a3b8', fontSize: '.75rem', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: '1.5rem' }}>
+                    <p style={{ textAlign: 'center', fontFamily: 'var(--font-playful)', fontWeight: 700, color: '#5c587a', fontSize: '.75rem', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: '1.5rem' }}>
                         How Fabula works
                     </p>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
                         {[
-                            { icon: '📖', step: 'Read', desc: 'An illustrated story in your target language — tailored to your level' },
-                            { icon: '✋', step: 'Discover', desc: 'Double-click any word for an instant definition, pronunciation & example' },
-                            { icon: '🧠', step: 'Practice', desc: '6 interactive exercises + flashcards to cement every new word' },
+                            { step: 'Read', desc: 'An illustrated story in your target language — tailored to your level' },
+                            { step: 'Discover', desc: 'Double-click any word for an instant definition, pronunciation & example' },
+                            { step: 'Practice', desc: '6 interactive exercises and flashcards to cement every new word' },
                         ].map(item => (
                             <div key={item.step} style={{
-                                background: 'rgba(255,255,255,0.75)',
+                                background: 'rgba(255,255,255,0.04)',
                                 borderRadius: 16, padding: '1.25rem',
                                 textAlign: 'center',
-                                border: '1.5px solid rgba(124,58,237,0.08)',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                                border: '1.5px solid rgba(255,255,255,0.07)',
                             }}>
-                                <div style={{ fontSize: '2rem', marginBottom: '.5rem' }}>{item.icon}</div>
-                                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', color: '#7c3aed', marginBottom: '.35rem' }}>{item.step}</div>
-                                <div style={{ fontFamily: 'var(--font-ui)', fontSize: '.78rem', color: '#64748b', lineHeight: 1.5 }}>{item.desc}</div>
+                                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', color: '#a78bfa', marginBottom: '.35rem' }}>{item.step}</div>
+                                <div style={{ fontFamily: 'var(--font-ui)', fontSize: '.78rem', color: '#6b6494', lineHeight: 1.5 }}>{item.desc}</div>
                             </div>
                         ))}
                     </div>
                 </div>
 
                 {/* ── FOOTER ────────────────────────────────────────────── */}
-                <p style={{ marginTop: '2.5rem', textAlign: 'center', fontFamily: 'var(--font-playful)', fontSize: '.75rem', color: '#94a3b8' }}>
-                    Fabula · Powered by OpenAI · 3 free stories daily, no account required
+                <p style={{ marginTop: '2.5rem', textAlign: 'center', fontFamily: 'var(--font-playful)', fontSize: '.75rem', color: '#5c587a' }}>
+                    Fabula · Powered by OpenAI · 1 free story daily, no account required
                 </p>
             </div>
         </main>
