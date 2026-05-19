@@ -1,6 +1,8 @@
 import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
 
+export const maxDuration = 60;
+
 export async function POST(req) {
     try {
         const { language, level, topic } = await req.json();
@@ -113,8 +115,8 @@ Return ONLY valid JSON, no markdown, no code fences:
                 model: "dall-e-3",
                 prompt: imagePrompt,
                 n: 1,
-                size: "1792x1024",
-                quality: "hd",
+                size: "1024x1024",
+                quality: "standard",
                 style: "natural",
             });
 
